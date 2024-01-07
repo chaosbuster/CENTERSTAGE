@@ -227,7 +227,7 @@ public class ArmJoint {
 
         // Let's loosen this specific servo.
         if (servo instanceof PwmControl)
-            ((PwmControl).servo).setPwmDisable();
+            ((PwmControl) servo).setPwmDisable();
     }
 
     
