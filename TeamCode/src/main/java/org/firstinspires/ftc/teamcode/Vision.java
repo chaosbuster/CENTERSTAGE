@@ -152,7 +152,7 @@ public class Vision extends BlocksOpModeCompanion
         }
         
         // Set the name of the file where the model can be found.
-        tfodBuilder.setModelFileName("BP_253_ssd_v2_fpnlite_320x320_metadata.tflite");
+        tfodBuilder.setModelFileName("bp_253_ssd_v2_fpnlite_320x320_metadata.tflite");
         // Set the full ordered list of labels the model is trained to recognize.
         tfodBuilder.setModelLabels(JavaUtil.createListWith(idTeamProp));
         // Set the aspect ratio for the images used when the model was created.
