@@ -1,97 +1,118 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Vision.getCENTERSTAGEDesiredTag;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
 @TeleOp(name = "TeleOpMode_withDriveToTag_V1_6 (Blocks to Java)")
 public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
 
   private Servo motor_dropPixels;
-
-  double thresholdSticks;
+  double drive, strafe, turn = 0.000;
   int stateMovingIn;
-  String cameraNameFront;
   int stateMovingOut;
-  double axial;
-  String allianceCurrent;
-  String cameraNameBack;
   int stateStopped;
-  double dropPixel_stop;
   int stateOfIntake;
-  double lateral;
-  String cameraNameCurrent;
+  double dropPixel_stop;
   int dropPixel_speed;
-  double yaw;
+
+  final String cameraNameFront = "Webcam_front";
+  String cameraNameBack = "Webcam_back";
+  String currentCameraName = cameraNameFront;
+  boolean useVision = false;
+
+  final int driveConfigA = 0;
+  final int driveConfigB = 1;
+  int currentDriveConfig = driveConfigA;
   ElapsedTime runtime;
-  int desiredTagID;
-  String allianceBlue;
-  double speedFactorCurrent;
-  int speedFactorforHigh;
-  int speedFactorforLow;
-  double scalefactorStrafe;
-  double scalefactorTurning;
-  int desiredTagDistance;
+
+  final int REDALLIANCE = 1;
+  final int BLUEALLIANCE = 2;
+  int currentAlliance = BLUEALLIANCE;
+
+  // April Tag detection and drive to variables
+  int desiredTagID = 0;
+  boolean targetTagFound = false;
+  int desiredTagDistance = 10;  // Inches
+
+  //  Effort factors that are divided into the requested drive, strafe or turn requests
+  final double SCALEFACTOR_SPEEDHIGH = 2.0;
+  final double SCALEFACTOR_SPEEDLOW = 4.0;
+  final double SCALEFACTOR_STRAFEHIGH = 2.0;
+  final double SCALEFACTOR_STRAFELOW = 4.0;
+  final double SCALEFACTOR_TURNHIGH = 3.0;
+  final double SCALEFACTOR_TURNLOW= 4.0;
+  // Default scale factors for our drivetrain movements
+  double scalefactorSpeed = SCALEFACTOR_SPEEDHIGH;
+  double scalefactorStrafe = SCALEFACTOR_STRAFEHIGH;
+  double scalefactorTurn = SCALEFACTOR_TURNHIGH;
+
 
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
   public void runOpMode() {
-    String allianceRed;
-    boolean useVision;
 
     motor_dropPixels = hardwareMap.get(Servo.class, "motor_dropPixels");
+    motor_dropPixels.setDirection(Servo.Direction.FORWARD);
+    initPixelLowerEject();
 
-    thresholdSticks = 0.2;
-    cameraNameFront = "Webcam_front";
-    cameraNameBack = "Webcam_back";
-    cameraNameCurrent = cameraNameFront;
-    allianceBlue = "Blue";
-    allianceRed = "Red";
-    allianceCurrent = "Blue";
-    desiredTagID = 1;
-    useVision = true;
     // Initialize vision libraries
     useVision = Vision.initVision(cameraNameFront, cameraNameBack);
-    // Initialize all of our drivetrain motors
+
     runtime = new ElapsedTime();
-    scalefactorTurning = 0.3;
-    scalefactorStrafe = 1.5;
-    speedFactorforHigh = 2;
-    speedFactorforLow = 5;
-    speedFactorCurrent = speedFactorforHigh;
-    desiredTagDistance = 10;
-    motor_dropPixels.setDirection(Servo.Direction.FORWARD);
-    // Initialize Drivetrain and Pose
+
+    // Initialize Drivetrain
     DrivetrainMecanumWithSmarts.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
+
     // Set drive to A Config.
     DrivetrainMecanumWithSmarts.setDriveToAConfig();
-    initPixelLowerEject();
+
     // Initialize Arm and Poses
     Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
+
     // Initialize gripper
     Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
+
     // Wait for the game to start (driver presses PLAY)
     telemetry.addData("Status", "Initialized");
     telemetry.update();
     waitForStart();
+
     runtime.reset();
+    
     // Run until the end of the match (driver presses STOP)
     while (opModeIsActive()) {
-      // Runs arm based on the state.
+      targetTagFound = false;
+      desiredTagID = 0;
+
+      // Runs arm based if on a state.
       Arm.runArmIteration();
+
+      // By gamepad1 left bumper / trigger
+      IfAskedToggleSpeedOrCameraDriveConfig();
       // Drive requests are by Stick or to Tags with DPad
       IfRequestingToDrive();
-      IfAskedPose();
-      IfAskedToggleDriveConfig();
-      IfAskedToggleSpeedOrCamera();
-      IfAskedDoGripper();
+
+      // By gamepad1 right bumper / trigger
       IfAskedEjectLowerPixel();
-      addDriveTelemetry();
+
+      // By gamepad2 XYAB
+      IfAskedPose();
+
+      // By gampad2 DPAD
+      IfAskedDoGripper();
+
+      addGeneralTelemetry();
+
       telemetry.update();
     }
   }
@@ -152,13 +173,13 @@ public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
    * Describe this function...
    */
   private void IfAskedEjectLowerPixel() {
-    if (gamepad2.left_bumper) {
+    if (gamepad1.right_bumper) {
       if (stateOfIntake != stateMovingIn) {
         motor_dropPixels.setDirection(Servo.Direction.FORWARD);
         stateOfIntake = stateMovingIn;
       }
       motor_dropPixels.setPosition(dropPixel_speed);
-    } else if (gamepad2.left_trigger != 0) {
+    } else if (gamepad1.right_trigger != 0) {
       if (stateOfIntake != stateMovingOut) {
         motor_dropPixels.setDirection(Servo.Direction.REVERSE);
         stateOfIntake = stateMovingOut;
@@ -173,42 +194,44 @@ public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
   /**
    * Describe this function...
    */
-  private void IfAskedToggleSpeedOrCamera() {
+  private void IfAskedToggleSpeedOrCameraDriveConfig() {
     if (gamepad1.left_bumper == true) {
       // Toggle Speed
-      if (speedFactorCurrent == speedFactorforHigh) {
+      if (scalefactorSpeed == SCALEFACTOR_SPEEDHIGH) {
         // Changing to low
-        speedFactorCurrent = speedFactorforLow;
+        scalefactorSpeed = SCALEFACTOR_SPEEDLOW;
+        scalefactorStrafe = SCALEFACTOR_STRAFELOW;
+        scalefactorTurn = SCALEFACTOR_TURNLOW;
+        
       } else {
         // Changing to high
-        speedFactorCurrent = speedFactorforHigh;
+        scalefactorSpeed = SCALEFACTOR_SPEEDHIGH;
+        scalefactorStrafe = SCALEFACTOR_STRAFEHIGH;
+        scalefactorTurn = SCALEFACTOR_TURNHIGH;        
       }
     } else if (gamepad1.left_trigger != 0) {
-      // Toggle Camera
-      if (cameraNameCurrent.equals(cameraNameFront)) {
-        // Changing to Back camera
-        // Switches the based on input.
+      // Toggle Camera & Drive Configuration
+      if (currentCameraName.equals(cameraNameFront)) {
+
+        // Changing to Back camera.  Switches based on input.
         Vision.doCameraSwitching(cameraNameBack);
-        cameraNameCurrent = cameraNameBack;
+        currentCameraName = cameraNameBack;
+
+        // Set drive to B Config.
+        DrivetrainMecanumWithSmarts.setDriveToBConfig();
+        currentDriveConfig = driveConfigB;
+
       } else {
+
         // Changing to Front camera
         // Switches the based on input.
         Vision.doCameraSwitching(cameraNameFront);
-        cameraNameCurrent = cameraNameFront;
-      }
-    }
-  }
+        currentCameraName = cameraNameFront;
 
-  /**
-   * Describe this function...
-   */
-  private void IfAskedToggleDriveConfig() {
-    if (gamepad1.right_bumper == true) {
-      // Set drive to A Config.
-      DrivetrainMecanumWithSmarts.setDriveToAConfig();
-    } else if (gamepad1.right_trigger != 0) {
-      // Set drive to B Config.
-      DrivetrainMecanumWithSmarts.setDriveToBConfig();
+        // Set drive to A Config.
+        DrivetrainMecanumWithSmarts.setDriveToAConfig();
+        currentDriveConfig = driveConfigA;
+      }
     }
   }
 
@@ -216,93 +239,74 @@ public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
    * Describe this function...
    */
   private void IfRequestingToDrive() {
-    double gainSpeed;
-    double gainStrafe;
-    double gainTurn;
-    double maxAutoSpeed;
-    double maxAutoStrafe;
-    double maxAutoTurn;
-    double tagRange;
-    double tagBearing;
-    double tagYaw;
-    double desiredTagRange;
+    int relativeTargetTag = 0;
 
-    if (Math.abs(gamepad1.left_stick_y) >= thresholdSticks || Math.abs(gamepad1.left_stick_x) >= thresholdSticks || Math.abs(gamepad1.right_stick_x) >= thresholdSticks) {
-      // Driver is driving based on Sticks
-      // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-      // Note: pushing stick forward gives negative value
-      axial = -(gamepad1.left_stick_y / speedFactorCurrent);
-      lateral = (gamepad1.left_stick_x / speedFactorCurrent) * scalefactorStrafe;
-      yaw = gamepad1.right_stick_x * scalefactorTurning;
-      addDriveTelemetry();
-      // Moves based on axial(Y,forward/backward), lateral(X, side-to-side) and yaw (turning)
-      DrivetrainMecanumWithSmarts.DriveXYT(axial, lateral, yaw);
-    } else if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
-      // Driver asking to drive to an AprilTag target
-      gainSpeed = 0.02;
-      gainStrafe = 0.015;
-      gainTurn = 0.01;
-      maxAutoSpeed = 0.05;
-      maxAutoStrafe = 0.05;
-      maxAutoTurn = 0.03;
-      if (gamepad1.dpad_left) {
-        if (allianceCurrent.equals(allianceBlue)) {
-          desiredTagID = 1;
-        } else {
-          desiredTagID = 1 + 3;
-        }
-      } else if (gamepad1.dpad_up) {
-        if (allianceCurrent.equals(allianceBlue)) {
-          desiredTagID = 2;
-        } else {
-          desiredTagID = 2 + 3;
-        }
-      } else if (gamepad1.dpad_right) {
-        if (allianceCurrent.equals(allianceBlue)) {
-          desiredTagID = 3;
-        } else {
-          desiredTagID = 3 + 3;
-        }
-      } else if (gamepad1.dpad_down) {
-      }
-      // Provides an AprilTagDetection structure for the detected April Tag.
-      if (Vision.getTagInfo(desiredTagID)) {
-        // Returns the Range only
-        tagRange = Vision.getTagRange(desiredTagID);
-        // Returns the Bearing only
-        tagBearing = Vision.getTagBearing(desiredTagID);
-        // Returns the Yaw only
-        tagYaw = Vision.getTagYaw(desiredTagID);
-        // Forward amount
-        desiredTagRange = tagRange - desiredTagDistance;
-        axial = Math.min(Math.max(desiredTagRange * gainSpeed, -maxAutoSpeed), maxAutoSpeed);
-        // Strafe amount
-        lateral = Math.min(Math.max(-tagYaw * gainStrafe, -maxAutoStrafe), maxAutoStrafe);
-        // Turn amount
-        yaw = Math.min(Math.max(tagBearing * gainTurn, -maxAutoTurn), maxAutoTurn);
-        addDriveTelemetry();
-        // Moves based on axial(Y,forward/backward), lateral(X, side-to-side) and yaw (turning)
-        DrivetrainMecanumWithSmarts.DriveXYT(axial, lateral, yaw);
+    if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
+      final double SPEED_GAIN = 0.02;
+      final double STRAFE_GAIN = 0.015;
+      final double TURN_GAIN = 0.01;
+      final double MAX_AUTO_SPEED = 0.05;
+      final double MAX_AUTO_STRAFE = 0.05;
+      final double MAX_AUTO_TURN = 0.03;
+
+      if (gamepad1.dpad_down) relativeTargetTag = 4;
+      if (gamepad1.dpad_left) relativeTargetTag = 1;
+      if (gamepad1.dpad_up) relativeTargetTag = 2;
+      if (gamepad1.dpad_right) relativeTargetTag = 3;
+
+      telemetry.addData("RELATIVE TAG REQUESTED", relativeTargetTag);
+
+      // Let's determine the AprilTag target
+      desiredTagID = Vision.getCENTERSTAGEDesiredTag(currentAlliance, relativeTargetTag);
+
+      if (desiredTagID == 0) return;
+
+      // Determines and sets latest values for desired AprilTag
+      targetTagFound = Vision.getTagInfo(desiredTagID);
+
+      if (targetTagFound) {
+
+        // Determine range, heading and yaw (tag image rotation) error so we can use them to
+        // control the robot automatically.
+        double rangeError = (Vision.getTagRange(desiredTagID) - desiredTagDistance);
+        double headingError = Vision.getTagBearing(desiredTagID);
+        double yawError = Vision.getTagYaw(desiredTagID);
+
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+        turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+        strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+        telemetry.addData("AUTO: DRIVE, STRAFE, TURN", JavaUtil.formatNumber(drive, 4, 2) + ", " + JavaUtil.formatNumber(strafe, 4, 2) + ", " + JavaUtil.formatNumber(turn, 4, 2));
+
       } else {
-        axial = 0;
-        lateral = 0;
-        yaw = 0;
+        return;
       }
+
     } else {
-      axial = 0;
-      lateral = 0;
-      yaw = 0;
+
+      // Drive using manual POV Joystick mode.  Slow things down to make the robot more controllable.
+      drive = -gamepad1.left_stick_y / scalefactorSpeed;
+      strafe = -gamepad1.left_stick_x / scalefactorStrafe;
+      turn = -gamepad1.right_stick_x / scalefactorTurn;
+
+      telemetry.addData("MANUAL DRIVE", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
     }
+
+    // Apply desired axes motions to the drivetrain.
+    DrivetrainMecanumWithSmarts.driveXYZ(drive, strafe, turn);
+
+    sleep(10);
   }
+
+
 
   /**
    * Describe this function...
    */
-  private void addDriveTelemetry() {
-    telemetry.addData("ALLIANCE", allianceCurrent);
+  private void addGeneralTelemetry() {
+    telemetry.addData("ALLIANCE", currentAlliance);
     telemetry.addData("Status", "Run Time: " + runtime);
-    telemetry.addData("DESIRED TAG ID", desiredTagID);
-    telemetry.addData("AXIAL, LATERAL, YAW", JavaUtil.formatNumber(axial, 4, 2) + ", " + JavaUtil.formatNumber(lateral, 4, 2) + ", " + JavaUtil.formatNumber(yaw, 4, 2));
   }
 
 }
