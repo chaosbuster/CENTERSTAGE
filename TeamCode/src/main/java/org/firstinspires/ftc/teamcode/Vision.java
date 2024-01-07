@@ -205,7 +205,7 @@ public class Vision extends BlocksOpModeCompanion
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
     public static boolean initVision(String _frontcameraname, String _backcameraname, String _alliancesensorname) {
-        float defaultGain = 2.0;
+        float defaultGain = 2;
         
         if (_alliancesensorname.length() > 0) {
             sensorColorAllianceNAME = new String (_alliancesensorname);
