@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -304,27 +305,4 @@ public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
     telemetry.addData("AXIAL, LATERAL, YAW", JavaUtil.formatNumber(axial, 4, 2) + ", " + JavaUtil.formatNumber(lateral, 4, 2) + ", " + JavaUtil.formatNumber(yaw, 4, 2));
   }
 
-  /**
-   * This function is used to test your motor directions.
-   */
-  private void testMotorDirections() {
-    // TODO: Enter the type for variable named leftFrontPower
-    UNKNOWN_TYPE leftFrontPower;
-    // TODO: Enter the type for variable named leftBackPower
-    UNKNOWN_TYPE leftBackPower;
-    // TODO: Enter the type for variable named rightFrontPower
-    UNKNOWN_TYPE rightFrontPower;
-    // TODO: Enter the type for variable named rightBackPower
-    UNKNOWN_TYPE rightBackPower;
-
-    // Each button should make the corresponding motor run FORWARD.
-    //   1) First get all the motors to take to correct positions on the robot
-    //      by adjusting your Robot Configuration if necessary.
-    //   2) Then make sure they run in the correct direction by modifying the
-    //      the setDirection() calls above.
-    leftFrontPower = gamepad1.x ? 1 : 0;
-    leftBackPower = gamepad1.a ? 1 : 0;
-    rightFrontPower = gamepad1.y ? 1 : 0;
-    rightBackPower = gamepad1.b ? 1 : 0;
-  }
 }
