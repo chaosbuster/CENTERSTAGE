@@ -884,24 +884,24 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
     } // end method setDriveToBConfig()
     
     @ExportToBlocks (
-        heading = "Drivetrain: Movement with provided XYT",
+        heading = "Drivetrain: Movement with provided XYZ",
         color = 255,
-        comment = "Moves based on axial(Y,forward/backward), lateral(X, side-to-side) and yaw (turning)",
-        tooltip = "Robot can see the object. Pass true if moving left",
+        comment = "Moves based on axial(X,forward/backward), lateral(Y, side-to-side) and yaw (Z, turning)",
+        tooltip = "Robot can see the object. ",
         parameterLabels = {"Axial (forward or backward)", "Lateral (left or right)", "Yaw (turning)"}
     )
     /**
-     * A function to use in teleop to pass the gamepad values and drive
+     * A function to use in teleop to pass the gamepad or April Tag values and drive
      */
-    public static void DriveXYT(double axial, double lateral, double yaw) {
+    public static void driveXYZ(double axial, double lateral, double yaw) {
         double max;
 
         // Combine the requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
-        speedLeftFront = axial + lateral + yaw;
-        speedRightFront = (axial - lateral) - yaw;
-        speedLeftBack = (axial - lateral) + yaw;
-        speedRightBack = (axial + lateral) - yaw;
+        speedLeftFront = axial - lateral + yaw;
+        speedRightFront = (axial + lateral) - yaw;
+        speedLeftBack = (axial + lateral) + yaw;
+        speedRightBack = (axial - lateral) - yaw;
         
         // Normalize the values so no wheel power exceeds 100%
         // This ensures that the robot maintains the desired motion.
@@ -919,7 +919,7 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
         driveLeftBackHW.setPower(speedLeftBack);
         driveRightBackHW.setPower(speedRightBack);
 
-    }
+    }  // end of driveXYZ()
 
     // **********  LOW Level driving functions.  ********************
 
