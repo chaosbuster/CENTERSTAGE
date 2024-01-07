@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -216,9 +217,14 @@ public class ArmJoint {
     }
 
     
-    // Releases the joint
-    public void release() {    
-        servo.getController().pwmDisable();
+    // Loosens the joint
+    public void loosen() {
+        // Command below disabled all servos, but all but one were set back to a position after
+        // one servo was set to a position:  servo.getController().pwmDisable();
+
+        // Let's loosen this specific servo.
+        if (servo instanceof PwmControl)
+            ((PwmControl).servo).setPwmDisable();
     }
 
     

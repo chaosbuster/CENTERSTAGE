@@ -574,23 +574,23 @@ public class Arm extends BlocksOpModeCompanion {
     }   // end method moveWristByIncrement()
 
     @ExportToBlocks (
-        heading = "Arm: Release Arm Joints",
+        heading = "Arm: Loosen Arm Joints",
         color = 255,
-        comment = "Releases each of the arm joints from a position",
+        comment = "Loosens each of the arm joints.",
         tooltip = "This will make the arm collapse."
     )
     /**
-     * Releases all the arm joints
+     * Loosens all the arm joints
      **/
-    static public void releaseArmJoints() {
+    static public void loosenArmJoints() {
         
-        // Moves joint by increment & sets to WAITING_FOR_COMMAND
-        wrist.release();
+        // Release and disable each arm joint
+        wrist.loosen();
         
         armState = State.WAITING_FOR_COMMAND;
         
-        telemetry.addData("Arm: ", "Releasing all the arm joints");
+        telemetry.addData("Arm: ", "Loosening all the arm joints");
         
-    }   // end method releaseArmJoints()
+    }   // end method loosenArmJoints()
 
 }
