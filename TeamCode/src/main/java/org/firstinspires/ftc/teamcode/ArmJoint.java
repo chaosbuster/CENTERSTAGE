@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import static java.lang.Math.abs;
 
 public class ArmJoint {
     
@@ -92,24 +93,26 @@ public class ArmJoint {
 
     // Sets a new target position for servo and initiates first move by increment
     public void setTargetPosition(double newTarget, double numberSteps) {
+        double MIN_INCREMENT = 0.0001;
 
         // Let's refresh and get our current position
         currentPosition = servo.getPosition();    
-        
-        if (newTarget > maxPos)
+
+        // Make sure we aren't outside of our MIN/MAX
+        if (newTarget > maxPos) {
             targetPosition = maxPos;
-        else if (newTarget < minPos)
-            targetPosition = minPos;
-        else
-            targetPosition = newTarget;
-        
+        } else targetPosition = Math.max(newTarget, minPos);
+
         if (numberSteps != 0)
             increment = (targetPosition - currentPosition)/numberSteps;
-            if (increment == 0)
-                if (targetPosition > currentPosition)
-                    increment = 0.0001;
-                else
-                    increment = -0.0001;
+
+        if (abs(increment) <= MIN_INCREMENT) {
+            if (targetPosition > currentPosition) {
+                increment = MIN_INCREMENT;
+            } else {
+                increment = -MIN_INCREMENT;
+            }
+        }
             
         movingToTarget = true;
 
