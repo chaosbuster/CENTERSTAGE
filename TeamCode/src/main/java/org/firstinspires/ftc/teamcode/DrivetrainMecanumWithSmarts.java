@@ -886,9 +886,11 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
     @ExportToBlocks (
         heading = "Drivetrain: Movement with provided XYZ",
         color = 255,
-        comment = "Moves based on axial(X,forward/backward), lateral(Y, side-to-side) and yaw (Z, turning)",
+        comment = "Moves based on axial X (Positive is forward), " +
+                  "lateral Y (Left is Positive) and " +
+                  "yaw Z (Positive is counter-clockwise)",
         tooltip = "Robot can see the object. ",
-        parameterLabels = {"Axial (forward or backward)", "Lateral (left or right)", "Yaw (turning)"}
+        parameterLabels = {"Axial X", "Lateral Y", "Yaw Z"}
     )
     /**
      * A function to use in teleop to pass the gamepad or April Tag values and drive
