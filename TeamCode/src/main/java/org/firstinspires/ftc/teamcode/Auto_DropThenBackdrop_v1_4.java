@@ -6,105 +6,90 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name = "Auto_DropThenBackdrop_v1_4 (Blocks to Java)")
 public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
+  
+  final String REDALLIANCE = "Red";
+  final String BLUEALLIANCE = "Blue";
+  String currentAlliance = BLUEALLIANCE;
+
+  final String LOCATION_BACKSTAGE = "Backstage";
+  final String LOCATION_AUDIENCE = "Audience";
+  String currentLocation = LOCATION_BACKSTAGE;
+
+  boolean useVision = false;
+  // Using pixels on image to determine which spike mark the object is on
+  int MINX_FORSPIKE_RIGHT = 300;  // X pixels on image where left of X is Center Spike, right of X is Right Spike
+  final int SPIKE_LEFT = 1;
+  final int SPIKE_CENTER = 2;
+  final int SPIKE_RIGHT = 3;
+  int targetSpike = SPIKE_LEFT; // Default to left spike
 
   private Servo motor_dropPixels;
+  final int DROPPIXEL_GO = 10;
+  final double DROPPIXEL_STOP = 0.5;
+  
   private Servo motor_shoulder;
-
-  int DropPixels_Go;
-  double DropPixels_Stop;
-  int spikeTarget;
-  int spikeRight;
-  int spikeLeft;
-
+  
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
   public void runOpMode() {
-    String allianceRed;
-    String allianceBlue;
-    String allianceCurrent;
-    String locationBackstage;
-    String locationAudience;
-    String locationCurrent;
-    int spikeCenter;
-    int minXforSpikeRight;
-    boolean useVision;
-    int distanceToMid;
-    double yawToRightSpike;
-    double yawToLeftSpike;
-    int distanceToSpike;
 
+    // Initialize our lower pixel ejection
     motor_dropPixels = hardwareMap.get(Servo.class, "motor_dropPixels");
-    motor_shoulder = hardwareMap.get(Servo.class, "motor_shoulder");
-
-    allianceRed = "Red";
-    allianceBlue = "Blue";
-    allianceCurrent = allianceBlue;
-    locationBackstage = "Backstage";
-    locationAudience = "Audience";
-    locationCurrent = locationBackstage;
-    // Helps us determine the spike marks
-    spikeLeft = 1;
-    spikeCenter = 2;
-    spikeRight = 3;
-    // Using pixels on image to determine which spike mark the object is on
-    minXforSpikeRight = 300;
-    DropPixels_Stop = 0.5;
-    DropPixels_Go = 10;
     motor_dropPixels.setDirection(Servo.Direction.FORWARD);
-    motor_dropPixels.setPosition(DropPixels_Stop);
+    motor_dropPixels.setPosition(DROPPIXEL_STOP);
+
+    // Initialize Drivetrain
+    DrivetrainMecanumWithSmarts.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
+
+    // Initialize Arm and Poses
+    Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
+
+    // TODO: MOVE THIS ACTION TO THE ARM CLASS
+    // Moving the shoulder up slightly to allow lower pixels to move freely
+    motor_shoulder = hardwareMap.get(Servo.class, "motor_shoulder");
+    motor_shoulder.setPosition(0.4);
+
+    // Initialize gripper
+    Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
+
     // Initialize our vision
     // Initialize vision libraries
     useVision = Vision.initVision("Webcam_front", "Webcam_back");
-    // Initialize Drivetrain and Pose
-    DrivetrainMecanumWithSmarts.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
-    // Initialize Arm and Poses
-    Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
-    // Moving the shoulder up slightly to allow lower pixels to move freely
-    motor_shoulder.setPosition(0.4);
-    // Initialize gripper
-    Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
-    // Distance to be equal distance in the middle of all three spikes
-    distanceToMid = 50;
-    // Yaw to turn clockwise (to right spike) or counterclockwise (to left spike)
-    yawToRightSpike = 0.5;
-    yawToLeftSpike = -0.5;
-    // Distance to the spike.
-    distanceToSpike = 75;
-    telemetry.addData("ALLIANCE", allianceCurrent);
+
+    telemetry.addData("ALLIANCE", currentAlliance);
+    telemetry.addData("LOCATION", currentLocation);
+    telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
     // Wait for the match to begin.
     telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
     telemetry.addData(">", "Touch Play to start OpMode");
     telemetry.update();
-    spikeTarget = spikeLeft;
-    while (opModeInInit()) {
+
+
+    while (opModeInInit() || !gamepad1.start) {
       if (useVision) {
-        telemetry.addData("USE VISION", "true");
         // Indicates whether the Team Prop is in sight.
-        spikeTarget = Vision.getTeamPropLocation("Bolt", minXforSpikeRight);
-      } else {
-        telemetry.addData("USE VISION", "false");
+        targetSpike = Vision.getTeamPropLocation("Bolt", MINX_FORSPIKE_RIGHT);
       }
-      if (gamepad1.a) {
-        locationCurrent = locationAudience;
-        telemetry.addData("LOCATION", "Audience");
-      } else if (gamepad1.b) {
-        locationCurrent = locationBackstage;
-      } else if (gamepad1.x) {
-        allianceCurrent = allianceBlue;
-      } else if (gamepad1.y) {
-        allianceCurrent = allianceRed;
-      }
-      telemetry.addData("ALLIANCE", allianceCurrent);
-      telemetry.addData("Target spike (1=Left, 2=Center, 3=Right)", spikeTarget);
+
+      // Using the X,Y,A or B on gamepad 1 to designate location and Alliance
+      getLocationPlusAlliance();
+
+      telemetry.addData("ALLIANCE", currentAlliance);
+      telemetry.addData("LOCATION", currentLocation);
+      telemetry.addData("USE VISION", useVision);
+      telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
       telemetry.update();
     }
-    telemetry.addData("Target spike (1=Left, 2=Center, 3=Right)", spikeTarget);
-    telemetry.update();
+
     waitForStart();
+
     if (opModeIsActive()) {
-      telemetry.addData("Target spike (1=Left, 2=Center, 3=Right)", spikeTarget);
+      telemetry.addData("ALLIANCE", currentAlliance);
+      telemetry.addData("LOCATION", currentLocation);
+      telemetry.addData("USE VISION", useVision);
+      telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
       telemetry.update();
       // Make sure our drivetrain is waiting for a command
       // Returns whether we are waiting for a command.
@@ -124,19 +109,44 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     }
   }
 
+
+  /**
+   * Provides a way to identify starting location and alliance with gamepad 1
+   */
+  private void getLocationPlusAlliance() {
+    if (gamepad1.a) {
+      currentLocation = LOCATION_AUDIENCE;
+    } else if (gamepad1.b) {
+      currentLocation = LOCATION_BACKSTAGE;
+    } else if (gamepad1.x) {
+      currentAlliance = BLUEALLIANCE;
+    } else if (gamepad1.y) {
+      currentAlliance = REDALLIANCE;
+    }
+
+  }
+
   /**
    * Describe this function...
    */
   private void DropPixel() {
-    motor_dropPixels.setPosition(DropPixels_Go);
+    motor_dropPixels.setPosition(DROPPIXEL_GO);
     sleep(4000);
-    motor_dropPixels.setPosition(DropPixels_Stop);
+    motor_dropPixels.setPosition(DROPPIXEL_STOP);
   }
 
   /**
    * Describe this function...
    */
   private void requestToMoveAndDropPurplePixel() {
+    // Distance to be equal distance in the middle of all three spikes
+    double distanceToMid = 50.0;  // NOT VALID or UPDATED / USED
+    // Yaw to turn clockwise (to right spike) or counterclockwise (to left spike)
+    double yawToRightSpike = 0.5;  // NOT VALID or UPDATED / USED
+    double yawToLeftSpike = -0.5;  // NOT VALID or UPDATED / USED
+    // Distance to the spike.
+    double distanceToSpike = 75;  // NOT VALID or UPDATED / USED
+
     // Let's move to the middle of the spike tile
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
@@ -152,7 +162,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     // Turn to left or right spike if necessary
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
-      if (spikeTarget == spikeRight) {
+      if (targetSpike == SPIKE_RIGHT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
         DrivetrainMecanumWithSmarts.turnToHeading(0.75, -50);
         // Returns whether we are waiting for a command.
@@ -160,7 +170,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
           // Runs drivetrain based on the state.
           DrivetrainMecanumWithSmarts.runDrivetrainIteration();
         }
-      } else if (spikeTarget == spikeLeft) {
+      } else if (targetSpike == SPIKE_LEFT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
         DrivetrainMecanumWithSmarts.turnToHeading(0.75, 50);
         // Returns whether we are waiting for a command.
@@ -170,7 +180,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
         }
       }
     }
-    // Move to spike
+    // Move to targeted spike
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
       // Drives Straight either Forward or Reverse.
@@ -201,7 +211,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     // Turn to left or right if necessary
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
-      if (spikeTarget == spikeRight) {
+      if (targetSpike == SPIKE_RIGHT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
         DrivetrainMecanumWithSmarts.turnToHeading(0.5, 0);
         // Returns whether we are waiting for a command.
@@ -209,7 +219,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
           // Runs drivetrain based on the state.
           DrivetrainMecanumWithSmarts.runDrivetrainIteration();
         }
-      } else if (spikeTarget == spikeLeft) {
+      } else if (targetSpike == SPIKE_LEFT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
         DrivetrainMecanumWithSmarts.turnToHeading(0.5, 0);
         // Returns whether we are waiting for a command.
