@@ -22,10 +22,6 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
   final int SPIKE_CENTER = 2;
   final int SPIKE_RIGHT = 3;
   int targetSpike = SPIKE_LEFT; // Default to left spike
-
-  private Servo motor_dropPixels;
-  final int DROPPIXEL_GO = 10;
-  final double DROPPIXEL_STOP = 0.5;
   
   private Servo motor_shoulder;
   
@@ -36,9 +32,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
   public void runOpMode() {
 
     // Initialize our lower pixel ejection
-    motor_dropPixels = hardwareMap.get(Servo.class, "motor_dropPixels");
-    motor_dropPixels.setDirection(Servo.Direction.FORWARD);
-    motor_dropPixels.setPosition(DROPPIXEL_STOP);
+    PixelEjector.init("motor_dropPixels");
 
     // Initialize Drivetrain
     DrivetrainMecanumWithSmarts.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
@@ -61,13 +55,12 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     telemetry.addData("ALLIANCE", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);
     telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
-    // Wait for the match to begin.
     telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
     telemetry.addData(">", "Touch Play to start OpMode");
     telemetry.update();
 
 
-    while (opModeInInit() || !gamepad1.start) {
+    while (opModeInInit() && !gamepad1.back) {
       if (useVision) {
         // Indicates whether the Team Prop is in sight.
         targetSpike = Vision.getTeamPropLocation("Bolt", MINX_FORSPIKE_RIGHT);
@@ -75,11 +68,20 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
 
       // Using the X,Y,A or B on gamepad 1 to designate location and Alliance
       getLocationPlusAlliance();
+      IfAskedDoGripper();
+      IfAskedMoveLowerEjector();
 
       telemetry.addData("ALLIANCE", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("USE VISION", useVision);
       telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
+      telemetry.addData("Preview Vision Detection", "3 dots, Camera Stream");
+      telemetry.addData(">", "Touch [Gamepad 1 Start] when all setup is done");
+      
+      telemetry.addData("Select Location [Gamepad 1]: ", "[A=Audience, B=Backstage]");
+      telemetry.addData("Select Alliance [Gamepad 1]: ", "[X=Blue Alliance, Y=Red Alliance]");
+      telemetry.addData("Load purple pixel [Gamepad 1]: ", "[Right Bumper-In, Right Trigger-Out]");
+      telemetry.addData("Load yellow pixel [Gamepad 2 DPAD]: ", "[LEFT-None, DOWN-One, RIGHT-Two]");
       telemetry.update();
     }
 
@@ -124,15 +126,6 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       currentAlliance = REDALLIANCE;
     }
 
-  }
-
-  /**
-   * Describe this function...
-   */
-  private void DropPixel() {
-    motor_dropPixels.setPosition(DROPPIXEL_GO);
-    sleep(4000);
-    motor_dropPixels.setPosition(DROPPIXEL_STOP);
   }
 
   /**
@@ -194,7 +187,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     }
     telemetry.update();
     if (opModeIsActive()) {
-      DropPixel();
+      PixelEjector.ejectPixel();
     }
     // Move away spike
     // Returns whether we are waiting for a command.
@@ -283,7 +276,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       telemetry.update();
     }
     if (opModeIsActive()) {
-      DropPixel();
+      PixelEjector.ejectPixel();
     }
     motor_shoulder.setPosition(0.3);
     sleep(4000);
@@ -303,4 +296,34 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       telemetry.update();
     }
   }
+
+  /**
+   * Describe this function...
+   */
+  private void IfAskedDoGripper() {
+    if (gamepad1.dpad_left) {
+      // Opens gripper
+      Gripper.GripNone();
+    } else if (gamepad1.dpad_down) {
+      // Grips one only
+      Gripper.GripOne();
+    } else if (gamepad1.dpad_right) {
+      // Tightens gripper to hold two pixels
+      Gripper.GripTwo();
+    }
+  }
+
+  /**
+   * Describe this function...
+   */
+  public void IfAskedMoveLowerEjector() {
+    if (gamepad1.right_bumper) {
+      PixelEjector.moveInward();
+    } else if (gamepad1.right_trigger != 0) {
+      PixelEjector.moveOutward();
+    } else {
+      PixelEjector.stop();
+    }
+  }
+  
 }
