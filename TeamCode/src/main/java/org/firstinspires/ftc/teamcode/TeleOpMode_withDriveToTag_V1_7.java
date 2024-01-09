@@ -101,7 +101,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       IfAskedDoGripper();
 
       // By gamepad2 BACK
-      IfAskedToLoosenArm()
+      IfAskedToLoosenArm();
 
       addGeneralTelemetry();
 
