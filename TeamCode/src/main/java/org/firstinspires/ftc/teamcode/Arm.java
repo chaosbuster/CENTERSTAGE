@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
-import org.firstinspires.ftc.robotcore.external.State;
-
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
 public class Arm extends BlocksOpModeCompanion {
     
@@ -586,6 +581,8 @@ public class Arm extends BlocksOpModeCompanion {
         
         // Release and disable each arm joint
         wrist.loosen();
+        elbow.loosen();
+        shoulder.loosen();
         
         armState = State.WAITING_FOR_COMMAND;
         
