@@ -26,6 +26,10 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   final int BLUEALLIANCE = 2;
   int currentAlliance = BLUEALLIANCE;
 
+  final String LOCATION_BACKSTAGE = "Backstage";
+  final String LOCATION_AUDIENCE = "Audience";
+  String currentLocation = LOCATION_BACKSTAGE;
+
   // April Tag detection and drive to variables
   int desiredTagID = 0;
   boolean targetTagFound = false;
@@ -68,8 +72,36 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     // Initialize gripper
     Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
 
+
+
     // Wait for the game to start (driver presses PLAY)
     telemetry.addData("Status", "Initialized");
+
+
+    while (opModeInInit() && !gamepad1.back) {
+
+      // Using the X,Y,A or B on gamepad 1 to designate location and Alliance
+      getLocationPlusAlliance();
+
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+      telemetry.addData("LOCATION", currentLocation);
+      telemetry.addData("USE VISION", useVision);
+      telemetry.addData("Preview Vision Detection", "3 dots, Camera Stream");
+      telemetry.addData(">", "Touch [Gamepad 1 Start] when all setup is done");
+
+      telemetry.addData("Select Location [Gamepad 1]: ", "[A=Audience, B=Backstage]");
+      telemetry.addData("Select Alliance [Gamepad 1]: ", "[X=Blue Alliance, Y=Red Alliance]");
+
+      telemetry.update();
+    }
+
+    currentAlliance = Vision.setAlliance(currentAlliance);
+    telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+    telemetry.addData("LOCATION", currentLocation);
+    telemetry.addData("USE VISION", useVision);
+    telemetry.addData("Preview Vision Detection", "3 dots, Camera Stream");
+    telemetry.addData(">", "Touch [Gamepad 1 Start] when all setup is done");
+
     telemetry.update();
     waitForStart();
 
@@ -102,6 +134,11 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
       // By gamepad2 BACK
       IfAskedToLoosenArm();
+
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+      telemetry.addData("LOCATION", currentLocation);
+      telemetry.addData("DESIRED TAG ID", desiredTagID);
+      telemetry.addData("Target Found", targetTagFound);
 
       addGeneralTelemetry();
 
@@ -242,10 +279,16 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       // Let's determine the AprilTag target
       desiredTagID = Vision.getCENTERSTAGEDesiredTag(currentAlliance, relativeTargetTag);
 
+      telemetry.addData("AUTO: Relative Target Tag requested", relativeTargetTag);
+      telemetry.addData("AUTO: Desired Tag ID", desiredTagID);
+
       if (desiredTagID == 0) return;
 
       // Determines and sets latest values for desired AprilTag
       targetTagFound = Vision.getTagInfo(desiredTagID);
+
+      telemetry.addData("AUTO: Target Found", targetTagFound);
+      sleep(10000);
 
       if (targetTagFound) {
 
@@ -263,6 +306,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
         telemetry.addData("AUTO: DRIVE, STRAFE, TURN", JavaUtil.formatNumber(drive, 4, 2) + ", " + JavaUtil.formatNumber(strafe, 4, 2) + ", " + JavaUtil.formatNumber(turn, 4, 2));
 
       } else {
+
         return;
       }
 
@@ -271,7 +315,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       // Drive using manual POV Joystick mode.  Slow things down to make the robot more controllable.
       drive = -gamepad1.left_stick_y / scalefactorSpeed;
       strafe = -gamepad1.left_stick_x / scalefactorStrafe;
-      turn = -gamepad1.right_stick_x / scalefactorTurn;
+      turn = gamepad1.right_stick_x / scalefactorTurn;
 
       telemetry.addData("MANUAL DRIVE", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
     }
@@ -292,6 +336,24 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   private void addGeneralTelemetry() {
     telemetry.addData("ALLIANCE", currentAlliance);
     telemetry.addData("Status", "Run Time: " + runtime);
+  }
+
+
+
+  /**
+   * Provides a way during Init mode to identify starting location and alliance with gamepad 1
+   */
+  private void getLocationPlusAlliance() {
+    if (gamepad1.a) {
+      currentLocation = LOCATION_AUDIENCE;
+    } else if (gamepad1.b) {
+      currentLocation = LOCATION_BACKSTAGE;
+    } else if (gamepad1.x) {
+      currentAlliance = BLUEALLIANCE;
+    } else if (gamepad1.y) {
+      currentAlliance = REDALLIANCE;
+    }
+
   }
 
 }

@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Autonomous(name = "Auto_DropThenBackdrop_v1_4 (Blocks to Java)")
 public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
   
-  final String REDALLIANCE = "Red";
-  final String BLUEALLIANCE = "Blue";
-  String currentAlliance = BLUEALLIANCE;
+  final int REDALLIANCE = 1;
+  final int BLUEALLIANCE = 2;
+  int currentAlliance = BLUEALLIANCE;
 
   final String LOCATION_BACKSTAGE = "Backstage";
   final String LOCATION_AUDIENCE = "Audience";
@@ -52,7 +52,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     // Initialize vision libraries
     useVision = Vision.initVision("Webcam_front", "Webcam_back");
 
-    telemetry.addData("ALLIANCE", currentAlliance);
+    telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);
     telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
     telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -71,7 +71,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       IfAskedDoGripper();
       IfAskedMoveLowerEjector();
 
-      telemetry.addData("ALLIANCE", currentAlliance);
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("USE VISION", useVision);
       telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);
@@ -85,10 +85,12 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       telemetry.update();
     }
 
+    currentAlliance = Vision.setAlliance(currentAlliance);
+
     waitForStart();
 
     if (opModeIsActive()) {
-      telemetry.addData("ALLIANCE", currentAlliance);
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("USE VISION", useVision);
       telemetry.addData("TARGET SPIKE (1=Left, 2=Center, 3=Right)", targetSpike);

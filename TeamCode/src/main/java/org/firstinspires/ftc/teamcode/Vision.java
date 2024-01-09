@@ -31,35 +31,29 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Vision.getCENTERSTAGEDesiredTag;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
-import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
-
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-
-import org.firstinspires.ftc.vision.VisionPortal.CameraState;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionPortal.CameraState;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This Vision library is a class with a set of methods to initialize and gather data from cameras 
@@ -236,7 +230,26 @@ public class Vision extends BlocksOpModeCompanion
         return (ableToRunVision && capableOfGettingAlliance);
          
     }  // end of initVision() with Alliance detection sensor
-    
+
+    @ExportToBlocks (
+            heading = "Vision: Set Alliance",
+            color = 255,
+            comment = "Let's our calling function set the Alliance ID",
+            tooltip = "Can call GetAlliance() after this is called."
+    )
+    /**
+     * [1=Red Alliance, 2=Blue Alliance]
+     **/
+    public static int setAlliance(int _allianceID) {
+
+        if (_allianceID < REDALLIANCE)
+            allianceID = REDALLIANCE;
+        else
+            allianceID = BLUEALLIANCE;
+
+        capableOfGettingAlliance = false;
+        return allianceID;
+    }
 
     @ExportToBlocks (
         heading = "Vision: Set Alliance",
@@ -610,19 +623,19 @@ public class Vision extends BlocksOpModeCompanion
         if (_allianceID == BLUEALLIANCE && _targetGoal == 1){
             desiredTagID = 1;
         } else if ((_allianceID == REDALLIANCE && _targetGoal == 1)){
-            desiredTagID = 1 + 3;
+            desiredTagID = 4;
         } else if (_allianceID == BLUEALLIANCE && _targetGoal == 2){
             desiredTagID = 2;
         } else if (_allianceID == REDALLIANCE && _targetGoal == 2){
-            desiredTagID = 2 + 3;
+            desiredTagID = 5;
         } else if (_allianceID == BLUEALLIANCE && _targetGoal == 3){
             desiredTagID = 3;
         } else if (_allianceID == REDALLIANCE && _targetGoal == 3){
-            desiredTagID = 3 + 3;
+            desiredTagID = 6;
         } else if (_allianceID == BLUEALLIANCE && _targetGoal == 4){
             desiredTagID = 7;
         } else if (_allianceID == REDALLIANCE && _targetGoal == 4) {
-            desiredTagID = 7 + 2;
+            desiredTagID = 9;
         } else {
             desiredTagID = 0;
         }
