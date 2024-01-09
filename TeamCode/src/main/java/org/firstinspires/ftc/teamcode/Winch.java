@@ -38,6 +38,7 @@ public class Winch extends BlocksOpModeCompanion {
     public static void hangRobot() {
 
         moveInward();
+        Arm.loosenArmJoints();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
