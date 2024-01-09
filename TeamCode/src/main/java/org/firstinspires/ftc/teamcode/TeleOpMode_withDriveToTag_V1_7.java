@@ -265,9 +265,9 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       final double SPEED_GAIN = 0.02;
       final double STRAFE_GAIN = 0.015;
       final double TURN_GAIN = 0.01;
-      final double MAX_AUTO_SPEED = 0.05;
-      final double MAX_AUTO_STRAFE = 0.05;
-      final double MAX_AUTO_TURN = 0.03;
+      final double MAX_AUTO_SPEED = 0.3;
+      final double MAX_AUTO_STRAFE = 0.2;
+      final double MAX_AUTO_TURN = 0.2;
 
       if (gamepad1.dpad_down) relativeTargetTag = 4;
       if (gamepad1.dpad_left) relativeTargetTag = 1;
@@ -288,7 +288,6 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       targetTagFound = Vision.getTagInfo(desiredTagID);
 
       telemetry.addData("AUTO: Target Found", targetTagFound);
-      sleep(10000);
 
       if (targetTagFound) {
 
@@ -300,7 +299,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-        turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+        turn = Range.clip(-headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
         strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
         telemetry.addData("AUTO: DRIVE, STRAFE, TURN", JavaUtil.formatNumber(drive, 4, 2) + ", " + JavaUtil.formatNumber(strafe, 4, 2) + ", " + JavaUtil.formatNumber(turn, 4, 2));

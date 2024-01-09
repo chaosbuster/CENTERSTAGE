@@ -470,7 +470,7 @@ public class Vision extends BlocksOpModeCompanion
         targetFound = false;
         desiredTag  = null;
 
-        if (aprilTag == null) {
+        if (aprilTag == null  || DESIRED_TAG_ID == 0) {
             targetFound = false;
             return targetFound;
         }
@@ -505,6 +505,8 @@ public class Vision extends BlocksOpModeCompanion
                     telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
                 }
             } else {
+
+                targetFound = false;
                 // This tag is NOT in the library, so we don't have enough information to track to it.
                 telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
             }
@@ -522,9 +524,9 @@ public class Vision extends BlocksOpModeCompanion
             desiredTag_Bearing = desiredTag.ftcPose.bearing;
             desiredTag_Yaw = desiredTag.ftcPose.yaw;            
         } else {
-            desiredTag_Range = desiredTag.ftcPose.range;
-            desiredTag_Bearing = desiredTag.ftcPose.bearing;
-            desiredTag_Yaw = desiredTag.ftcPose.yaw;            
+            desiredTag_Range = 0;
+            desiredTag_Bearing = 0;
+            desiredTag_Yaw = 0;
         }
         
         return targetFound;
@@ -633,7 +635,7 @@ public class Vision extends BlocksOpModeCompanion
         } else if (_allianceID == REDALLIANCE && _targetGoal == 3){
             desiredTagID = 6;
         } else if (_allianceID == BLUEALLIANCE && _targetGoal == 4){
-            desiredTagID = 7;
+            desiredTagID = 8;
         } else if (_allianceID == REDALLIANCE && _targetGoal == 4) {
             desiredTagID = 9;
         } else {
