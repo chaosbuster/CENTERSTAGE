@@ -60,7 +60,7 @@ public class Winch extends BlocksOpModeCompanion {
         currentSpeed = servo.getPosition();
         if (stateOfWinch != STATE_MOVINGIN) {
             servo.setPosition(STATE_STOPPED);            
-            servo.setDirection(Servo.Direction.REVERSE);
+            servo.setDirection(Servo.Direction.FORWARD);
             stateOfWinch = STATE_MOVINGIN;
         }
         servo.setPosition(SPEED_TOMOVE);
@@ -72,7 +72,7 @@ public class Winch extends BlocksOpModeCompanion {
         currentSpeed = servo.getPosition();
         if (stateOfWinch != STATE_MOVINGOUT) {
             servo.setPosition(STATE_STOPPED);
-            servo.setDirection(Servo.Direction.FORWARD);
+            servo.setDirection(Servo.Direction.REVERSE);
             stateOfWinch = STATE_MOVINGOUT;
         }
         servo.setPosition(SPEED_TOMOVE);
