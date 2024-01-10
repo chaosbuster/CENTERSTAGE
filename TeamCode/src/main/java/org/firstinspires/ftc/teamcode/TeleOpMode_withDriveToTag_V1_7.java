@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.abs;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -72,7 +74,8 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     // Initialize gripper
     Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
 
-
+    // Initialize winch
+    Winch.init("motor_winch");
 
     // Wait for the game to start (driver presses PLAY)
     telemetry.addData("Status", "Initialized");
@@ -117,6 +120,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
       // By gamepad1 left bumper / trigger
       IfAskedToggleSpeedOrCameraDriveConfig();
+
       // Drive requests are by Stick or to Tags with DPad
       IfRequestingToDrive();
 
@@ -135,6 +139,9 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       // By gamepad2 BACK
       IfAskedToLoosenArm();
 
+      // By gamepad2 leftstick.Y
+      IfAskedToUseWinch();
+
       telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("DESIRED TAG ID", desiredTagID);
@@ -150,8 +157,8 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
    * Describe this function...
    */
   private void IfAskedPose() {
-    if (gamepad2.x) {
-      telemetry.addLine("FUNCTION: Move to Pose X");
+    if (gamepad2.y) {
+      telemetry.addLine("FUNCTION: Move to Pose UP");
       // Moves the arm to an UP pose.
       Arm.moveToPose_UP();
     } else if (gamepad2.a) {
@@ -162,7 +169,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       telemetry.addLine("FUNCTION: Move to Pose TRAVEL");
       // Moves the arm to an TRAVEL pose.
       Arm.moveToPose_TRAVEL();
-    } else if (gamepad2.y) {
+    } else if (gamepad2.x) {
       telemetry.addLine("FUNCTION: Move to Pose BACKDROP");
       // Moves the arm to an BACKDROP pose.
       Arm.moveToPose_BACKDROP();
@@ -170,15 +177,22 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   }
 
   private void IfAskedMoveArmByIncrement() {
-    if (gamepad2.right_bumper) {
-      Arm.moveWristByIncrement(0.001);
-    } else if (gamepad2.right_trigger != 0) {
-      Arm.moveWristByIncrement(-0.001);
+    double threshold = 0.2;
+
+    if (gamepad2.left_bumper) {
+      Arm.moveWristByIncrement(0.003);
+    } else if (gamepad2.left_trigger != 0) {
+      Arm.moveWristByIncrement(-0.003);
     }
     if (gamepad2.right_bumper) {
-      Arm.moveElbowByIncrement(0.001);
+      Arm.moveElbowByIncrement(0.003);
     } else if (gamepad2.right_trigger != 0) {
-      Arm.moveElbowByIncrement(-0.001);
+      Arm.moveElbowByIncrement(-0.003);
+    }
+    if (gamepad2.right_stick_y < 0 && abs(gamepad2.right_stick_y) > threshold) {// Increase
+      Arm.moveShoulderByIncrement(0.001);
+    } else if (gamepad2.right_stick_y > 0 && abs(gamepad2.right_stick_y) > threshold) {// Decrease
+      Arm.moveShoulderByIncrement(-0.001);
     }
   }
 
@@ -209,6 +223,17 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     } else {
       PixelEjector.stop();
     }
+  }
+
+  public void IfAskedToUseWinch() {
+    double threshold = 0.2;
+
+    if (gamepad2.left_stick_y < 0 && abs(gamepad2.left_stick_y) > threshold) // Move up
+      Winch.moveInward();
+    else if (gamepad2.left_stick_y > 0 && abs(gamepad2.left_stick_y) > threshold) // Move down
+      Winch.moveOutward();
+    else
+      Winch.stop();
   }
 
   /**
