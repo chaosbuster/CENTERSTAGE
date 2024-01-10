@@ -86,7 +86,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       // Using the X,Y,A or B on gamepad 1 to designate location and Alliance
       getLocationPlusAlliance();
 
-      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset]", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("USE VISION", useVision);
       telemetry.addData("Preview Vision Detection", "3 dots, Camera Stream");
@@ -99,7 +99,8 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     }
 
     currentAlliance = Vision.setAlliance(currentAlliance);
-    telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+
+    telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset]", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);
     telemetry.addData("USE VISION", useVision);
     telemetry.addData("Preview Vision Detection", "3 dots, Camera Stream");
@@ -142,7 +143,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       // By gamepad2 leftstick.Y
       IfAskedToUseWinch();
 
-      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
+      telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset]", currentAlliance);
       telemetry.addData("LOCATION", currentLocation);
       telemetry.addData("DESIRED TAG ID", desiredTagID);
       telemetry.addData("Target Found", targetTagFound);

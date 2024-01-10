@@ -243,10 +243,11 @@ public class Vision extends BlocksOpModeCompanion
     public static int setAlliance(int _allianceID) {
 
         if (_allianceID < REDALLIANCE)
-            allianceID = REDALLIANCE;
-        else
-            allianceID = BLUEALLIANCE;
+            _allianceID = REDALLIANCE;
+        else if (_allianceID > BLUEALLIANCE)
+            _allianceID = BLUEALLIANCE;
 
+        allianceID = _allianceID;
         capableOfGettingAlliance = false;
         return allianceID;
     }
