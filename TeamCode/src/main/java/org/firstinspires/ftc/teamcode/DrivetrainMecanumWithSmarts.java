@@ -956,7 +956,7 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
 
         // Determine range, heading and yaw (tag image rotation) error so we can use them to
         // control the robot automatically.
-        double rangeError = _CURRENTRANGE - _TARGETDISTANCE);
+        double rangeError = _CURRENTRANGE - _TARGETDISTANCE;
         double headingError = _CURRENTHEADING;
         double yawError = _CURRENTYAW;
 
