@@ -5,7 +5,6 @@ import static java.lang.Math.abs;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
@@ -317,19 +316,16 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
       if (targetTagFound) {
 
-        // Determine range, heading and yaw (tag image rotation) error so we can use them to
+        // Determine range, heading and yaw (tag image rotation) so we can use them to
         // control the robot automatically.
-        double rangeError = (Vision.getTagRange(desiredTagID) - desiredTagDistance);
-        double headingError = Vision.getTagBearing(desiredTagID);
-        double yawError = Vision.getTagYaw(desiredTagID);
+        double range = Vision.getTagRange(desiredTagID);
+        double heading = Vision.getTagBearing(desiredTagID);
+        double yaw = Vision.getTagYaw(desiredTagID);
 
-        // Use the speed and turn "gains" to calculate how we want the robot to move.
-        drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-        turn = Range.clip(-headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-        strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        telemetry.addData("TAG: range, heading, yaw", JavaUtil.formatNumber(range, 4, 2) + ", " + JavaUtil.formatNumber(heading, 4, 2) + ", " + JavaUtil.formatNumber(yaw, 4, 2));
 
-        telemetry.addData("AUTO: DRIVE, STRAFE, TURN", JavaUtil.formatNumber(drive, 4, 2) + ", " + JavaUtil.formatNumber(strafe, 4, 2) + ", " + JavaUtil.formatNumber(turn, 4, 2));
-
+        DrivetrainMecanumWithSmarts.driveToHeading(desiredTagDistance, range, heading, yaw);
+        
       } else {
 
         return;
@@ -343,10 +339,10 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       turn = gamepad1.right_stick_x / scalefactorTurn;
 
       telemetry.addData("MANUAL DRIVE", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-    }
 
-    // Apply desired axes motions to the drivetrain.
-    DrivetrainMecanumWithSmarts.driveXYZ(drive, strafe, turn);
+      // Apply desired axes motions to the drivetrain.
+      DrivetrainMecanumWithSmarts.driveXYZ(drive, strafe, turn);
+    }
 
     sleep(10);
   }

@@ -934,7 +934,44 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
         driveLeftFrontHW.setDirection(DcMotorSimple.Direction.REVERSE);
         
     } // end method setDriveToBConfig()
-    
+
+    @ExportToBlocks (
+            heading = "Drivetrain: To Heading",
+            color = 255,
+            comment = "Moves to a distance away from a target provided.",
+            tooltip = "Robot can see the object. ",
+            parameterLabels = {"Target Distance Away From Object", "Range", "Heading", "Yaw"}
+    )
+    /**
+     *
+     *  Can be used for driving to an AprilTag
+     */
+    public static void driveToHeading(double _TARGETDISTANCE, double _CURRENTRANGE, double _CURRENTHEADING, double _CURRENTYAW) {
+        final double SPEED_GAIN = 0.02;
+        final double STRAFE_GAIN = 0.015;
+        final double TURN_GAIN = 0.01;
+        final double MAX_AUTO_SPEED = 0.3;
+        final double MAX_AUTO_STRAFE = 0.2;
+        final double MAX_AUTO_TURN = 0.2;
+
+        // Determine range, heading and yaw (tag image rotation) error so we can use them to
+        // control the robot automatically.
+        double rangeError = _CURRENTRANGE - _TARGETDISTANCE);
+        double headingError = _CURRENTHEADING;
+        double yawError = _CURRENTYAW;
+
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        double drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+        double turn = Range.clip(-headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+        double strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+        telemetry.addData("AUTO: DRIVE, STRAFE, TURN", JavaUtil.formatNumber(drive, 4, 2) + ", " + JavaUtil.formatNumber(strafe, 4, 2) + ", " + JavaUtil.formatNumber(turn, 4, 2));
+
+        driveXYZ(drive, strafe, turn);
+
+    }  // end of driveToHeading()
+
+
     @ExportToBlocks (
         heading = "Drivetrain: Movement with provided XYZ",
         color = 255,
