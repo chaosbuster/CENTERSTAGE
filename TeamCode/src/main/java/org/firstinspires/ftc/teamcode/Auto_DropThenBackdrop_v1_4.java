@@ -52,7 +52,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
 
     // Initialize our vision
     // Initialize vision libraries
-    useVision = Vision.initVision("Webcam_front", "Webcam_back", "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
+    useVision = Vision.initVision2Cameras("Webcam_front", "Webcam_back", "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
 
     telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);

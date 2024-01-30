@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
+import java.util.Arrays;
+
 @TeleOp(name = "TeleOpMode_withDriveToTag_V1_7 (Blocks to Java)")
 public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
@@ -57,7 +59,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     PixelEjector.init("motor_dropPixels");
 
     // Initialize vision libraries
-    useVision = Vision.initVision(cameraNameFront, cameraNameBack);
+    useVision = Vision.initVision1Camera(cameraNameFront, cameraNameBack, "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
 
     runtime = new ElapsedTime();
 
@@ -71,7 +73,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
 
     // Initialize gripper
-    Gripper.init("motor_gripper", 1, 0.2, 0.5, 1);
+    ActiveIntakeWithServo.init("motor_gripper");
 
     // Initialize winch
     Winch.init("motor_winch");
@@ -134,7 +136,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       IfAskedMoveArmByIncrement();
 
       // By gampad2 DPAD
-      IfAskedDoGripper();
+      IfAskedDoIntake();
 
       // By gamepad2 BACK
       IfAskedToLoosenArm();
@@ -199,16 +201,16 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   /**
    * Describe this function...
    */
-  private void IfAskedDoGripper() {
+  private void IfAskedDoIntake() {
     if (gamepad2.dpad_left) {
-      // Opens gripper
-      Gripper.GripNone();
+      // Moves intake inward
+      ActiveIntakeWithServo.moveInward();
     } else if (gamepad2.dpad_down) {
-      // Grips one only
-      Gripper.GripOne();
+      // Stops the intake
+      ActiveIntakeWithServo.stop();
     } else if (gamepad2.dpad_right) {
-      // Tightens gripper to hold two pixels
-      Gripper.GripTwo();
+      // Moves intake outward
+      ActiveIntakeWithServo.moveOutward();
     }
   }
 
