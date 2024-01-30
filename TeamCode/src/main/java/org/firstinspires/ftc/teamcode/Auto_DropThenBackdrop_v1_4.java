@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.Arrays;
+
 @Autonomous(name = "Auto_DropThenBackdrop_v1_4 (Blocks to Java)")
 public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
   
@@ -50,7 +52,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
 
     // Initialize our vision
     // Initialize vision libraries
-    useVision = Vision.initVision("Webcam_front", "Webcam_back");
+    useVision = Vision.initVision("Webcam_front", "Webcam_back", "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
 
     telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);
