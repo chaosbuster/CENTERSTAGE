@@ -99,7 +99,8 @@ public class Vision extends BlocksOpModeCompanion
     static private int allianceID = 0;  // Used to store the Alliance we are on. 0=if not set, 1=Red, 2=Blue 
     static private int REDALLIANCE =1;
     static private int BLUEALLIANCE = 2;
-                                        // Will determine in CENTERSTAGE season with a REV Color sensor on the bot reading a blue or red LEGO brick.
+
+    // Will determine in CENTERSTAGE season with a REV Color sensor on the bot reading a blue or red LEGO brick.
     static private NormalizedColorSensor sensorColorAllianceHW = null;
     static private String sensorColorAllianceNAME;
     static private boolean capableOfGettingAlliance = false;  // Used to determine if Alliance detection color sensor is able to be used.
@@ -189,7 +190,7 @@ public class Vision extends BlocksOpModeCompanion
 
 
     @ExportToBlocks (
-        heading = "Vision: Initialize with Alliance Detection",
+        heading = "Vision: Initialize with Alliance Sensor",
         color = 255,
         comment = "Initialize alliance detection sensor and vision libraries",
         tooltip = "Wait to start until you see the START displayed.",
@@ -201,7 +202,7 @@ public class Vision extends BlocksOpModeCompanion
     /**
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
-    public static boolean initVision(String _frontcameraname, String _backcameraname, String _alliancesensorname) {
+    public static boolean initVisionWithAllianceSensor(String _frontcameraname, String _backcameraname, String _alliancesensorname) {
         float defaultGain = 2;
         
         if (_alliancesensorname.length() > 0) {
