@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Vision.getCENTERSTAGEDesiredTag;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+
+import java.util.Arrays;
 
 @TeleOp(name = "TeleOpMode_withDriveToTag_V1_6 (Blocks to Java)")
 public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
@@ -66,7 +65,7 @@ public class TeleOpMode_withDriveToTag_V1_6 extends LinearOpMode {
     initPixelLowerEject();
 
     // Initialize vision libraries
-    useVision = Vision.initVision(cameraNameFront, cameraNameBack);
+    useVision = Vision.initVision2Cameras("Webcam_front", "Webcam_back", "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
 
     runtime = new ElapsedTime();
 

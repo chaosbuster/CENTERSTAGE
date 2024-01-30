@@ -40,7 +40,6 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -282,7 +281,7 @@ public class Vision extends BlocksOpModeCompanion
     /**
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
-    public static boolean initVisionWithAllianceSensor(String _frontcameraname, String _backcameraname, String _alliancesensorname) {
+    public static boolean initVisionWithAllianceSensor(String _frontcameraname, String _backcameraname, String _filename_model, List <String> _labels, String _alliancesensorname) {
         float defaultGain = 2;
         
         if (_alliancesensorname.length() > 0) {
@@ -306,7 +305,7 @@ public class Vision extends BlocksOpModeCompanion
             capableOfGettingAlliance = false;
         }
         
-        ableToRunVision = initVision(_frontcameraname, _backcameraname);
+        ableToRunVision = initVision2Cameras(_frontcameraname, _backcameraname, _filename_model, _labels);
 
         return (ableToRunVision && capableOfGettingAlliance);
          

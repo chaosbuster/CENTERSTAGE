@@ -59,7 +59,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     PixelEjector.init("motor_dropPixels");
 
     // Initialize vision libraries
-    useVision = Vision.initVision1Camera(cameraNameFront, cameraNameBack, "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
+    useVision = Vision.initVision2Cameras(cameraNameFront, cameraNameBack, "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
 
     runtime = new ElapsedTime();
 
