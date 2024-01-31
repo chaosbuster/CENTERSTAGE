@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
 public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
     
@@ -17,7 +18,19 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
     static private String servoName = null;
     static private Servo servo    = null;
     static private double currentSpeed  = SPEED_STOP;
-    
+
+
+
+    @ExportToBlocks(
+            heading = "Intake: Initialize",
+            color = 255,
+            comment = "Initialize active intake",
+            tooltip = "The motor should be a servo.",
+            parameterLabels = {"Intake Servo Name"
+            }
+    )
+    /** Initialize active intake
+     */
     // Initializes the active intake and sets it to stopped
     public static void init(String _servoName) {
 
@@ -34,7 +47,15 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
         stateOfIntake = STATE_STOPPED;
     }
 
-  // Ejects a game object
+
+    @ExportToBlocks(
+            heading = "Intake: Eject a game element",
+            color = 255,
+            comment = "Will move intake outward for a certain amount of seconds",
+            tooltip = "Right now the time is in the method."
+    )
+    /** Initialize active intake
+     */   // Ejects a game object
     public static void ejectOneGameObject() {
 
         moveOutward();
@@ -46,6 +67,12 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
         stop();
     }
 
+    @ExportToBlocks(
+            heading = "Intake: Stop motion",
+            color = 255,
+            comment = "Will stop movement of intake",
+            tooltip = "Do you really want it to stop?"
+    )
     // Stops running servo
     public static void stop() {
         servo.setPosition(SPEED_STOP);
@@ -53,25 +80,37 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
         currentSpeed = SPEED_STOP;
     }
 
-    // Starts (or continues) running servo inward
+    @ExportToBlocks(
+            heading = "Intake: Starts moving inward",
+            color = 255,
+            comment = "Will start moving intake inward",
+            tooltip = "Do not need to continuously send this command."
+    )
+    // Starts running servo inward
     public static void moveInward() {
 
         currentSpeed = servo.getPosition();
         if (stateOfIntake != STATE_MOVINGIN) {
             servo.setPosition(STATE_STOPPED);            
-            servo.setDirection(Servo.Direction.REVERSE);
+            servo.setDirection(Servo.Direction.FORWARD);
             stateOfIntake = STATE_MOVINGIN;
         }
         servo.setPosition(SPEED_TOMOVE);
     }
 
     // Starts (or continues) running servo outward
+    @ExportToBlocks(
+            heading = "Intake: Starts moving outward",
+            color = 255,
+            comment = "Will start moving intake outward",
+            tooltip = "Do not need to continuously send this command."
+    )
     public static void moveOutward() {
 
         currentSpeed = servo.getPosition();
         if (stateOfIntake != STATE_MOVINGOUT) {
             servo.setPosition(STATE_STOPPED);
-            servo.setDirection(Servo.Direction.FORWARD);
+            servo.setDirection(Servo.Direction.REVERSE);
             stateOfIntake = STATE_MOVINGOUT;
         }
         servo.setPosition(SPEED_TOMOVE);

@@ -353,10 +353,10 @@ public class Arm extends BlocksOpModeCompanion {
         // Constructor and initialization of pose  
         // public Pose(String _name, double _shoulder, double _elbow, double _wrist)        
         poseInit = new Pose("Initial", 0.25, 1.0, 1.0);
-        poseUp = new Pose("Up", 0.576, 0.419, 0.5);
-        poseFloor = new Pose("Floor", 0.521, 0.038, 0.632);    
-        poseTravel = new Pose("Travel", 0.26, 0.998, 0.551);    
-        poseBackdrop = new Pose("Backdrop", 0.529, 0.587, 0.258);    
+        poseUp = new Pose("Up", 0.492, 0.526, 0.151);
+        poseFloor = new Pose("Floor", 0.479, 0.167, 0.626);
+        poseTravel = new Pose("Travel", 0.252, 0.999, 0.803);
+        poseBackdrop = new Pose("Backdrop", 0.597, 0.513, 0.264);
     
         // Ready to receive commands
         armState = State.WAITING_FOR_COMMAND;    

@@ -161,7 +161,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
       if (targetSpike == SPIKE_RIGHT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
-        DrivetrainMecanumWithSmarts.turnToHeading(0.75, -50);
+        DrivetrainMecanumWithSmarts.turnToHeading(0.5, -50);
         // Returns whether we are waiting for a command.
         while (opModeIsActive() && !DrivetrainMecanumWithSmarts.waitingForCommand()) {
           // Runs drivetrain based on the state.
@@ -169,7 +169,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
         }
       } else if (targetSpike == SPIKE_LEFT) {
         // Turns to Absolute Heading Angle (in Degrees) relative to last gyro reset.
-        DrivetrainMecanumWithSmarts.turnToHeading(0.75, 50);
+        DrivetrainMecanumWithSmarts.turnToHeading(0.5, 50);
         // Returns whether we are waiting for a command.
         while (opModeIsActive() && !DrivetrainMecanumWithSmarts.waitingForCommand()) {
           // Runs drivetrain based on the state.
@@ -190,10 +190,12 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       telemetry.update();
     }
     telemetry.update();
+
+    // EJECT OUR PURPLE PIXEL
     if (opModeIsActive()) {
       PixelEjector.ejectPixel();
     }
-    // Move away spike
+    // Move away from spike
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {
       // Drives Straight either Forward or Reverse.
@@ -205,6 +207,7 @@ public class Auto_DropThenBackdrop_v1_4 extends LinearOpMode {
       }
       telemetry.update();
     }
+
     // Turn to left or right if necessary
     // Returns whether we are waiting for a command.
     if (opModeIsActive() && DrivetrainMecanumWithSmarts.waitingForCommand()) {

@@ -202,15 +202,15 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
    * Describe this function...
    */
   private void IfAskedDoIntake() {
-    if (gamepad2.dpad_left) {
+    if (gamepad2.dpad_down) {
       // Moves intake inward
       ActiveIntakeWithServo.moveInward();
-    } else if (gamepad2.dpad_down) {
+    } else if (gamepad2.dpad_up) {
       // Stops the intake
-      ActiveIntakeWithServo.stop();
-    } else if (gamepad2.dpad_right) {
-      // Moves intake outward
       ActiveIntakeWithServo.moveOutward();
+    } else  {
+      // Moves intake outward
+      ActiveIntakeWithServo.stop();
     }
   }
 
