@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -118,7 +119,7 @@ public class Vision extends BlocksOpModeCompanion
     /**
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
-    public static boolean initVision1Camera(String _frontcameraname, String _filename_model, List <String> _labels) {
+    public static boolean initVision1Camera(String _frontcameraname) {
 
         frontcamera_name = new String (_frontcameraname);
 
@@ -147,9 +148,9 @@ public class Vision extends BlocksOpModeCompanion
         }
 
         // Set the name of the file where the model can be found.
-        tfodBuilder.setModelFileName(_filename_model);
+        tfodBuilder.setModelFileName("bp_253_ssd_v2_fpnlite_320x320_metadata.tflite");
         // Set the full ordered list of labels the model is trained to recognize.
-        tfodBuilder.setModelLabels(_labels);
+        tfodBuilder.setModelLabels(JavaUtil.createListWith("Bolt"));
         // Set the aspect ratio for the images used when the model was created.
         tfodBuilder.setModelAspectRatio(16 / 9);
         // Create a TfodProcessor by calling build.
@@ -198,7 +199,7 @@ public class Vision extends BlocksOpModeCompanion
     /**
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
-    public static boolean initVision2Cameras(String _frontcameraname, String _backcameraname, String _filename_model, List <String> _labels) {
+    public static boolean initVision2Cameras(String _frontcameraname, String _backcameraname) {
         
         frontcamera_name = new String (_frontcameraname);
         backcamera_name = new String (_backcameraname);
@@ -229,9 +230,9 @@ public class Vision extends BlocksOpModeCompanion
         }
         
         // Set the name of the file where the model can be found.
-        tfodBuilder.setModelFileName(_filename_model);
+        tfodBuilder.setModelFileName("bp_253_ssd_v2_fpnlite_320x320_metadata.tflite");
         // Set the full ordered list of labels the model is trained to recognize.
-        tfodBuilder.setModelLabels(_labels);
+        tfodBuilder.setModelLabels(JavaUtil.createListWith("Bolt"));
         // Set the aspect ratio for the images used when the model was created.
         tfodBuilder.setModelAspectRatio(16 / 9);
         // Create a TfodProcessor by calling build.
@@ -281,7 +282,7 @@ public class Vision extends BlocksOpModeCompanion
     /**
      * Initialize the AprilTag and Tensorflow processors within the Vision Portal.
      **/
-    public static boolean initVisionWithAllianceSensor(String _frontcameraname, String _backcameraname, String _filename_model, List <String> _labels, String _alliancesensorname) {
+    public static boolean initVisionWithAllianceSensor(String _frontcameraname, String _backcameraname, String _filename_model, String _labels, String _alliancesensorname) {
         float defaultGain = 2;
         
         if (_alliancesensorname.length() > 0) {
@@ -305,7 +306,7 @@ public class Vision extends BlocksOpModeCompanion
             capableOfGettingAlliance = false;
         }
         
-        ableToRunVision = initVision2Cameras(_frontcameraname, _backcameraname, _filename_model, _labels);
+        ableToRunVision = initVision2Cameras(_frontcameraname, _backcameraname);
 
         return (ableToRunVision && capableOfGettingAlliance);
          
