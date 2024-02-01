@@ -48,33 +48,38 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   public static double scalefactorStrafe = SCALEFACTOR_STRAFEHIGH;
   public static double scalefactorTurn = SCALEFACTOR_TURNHIGH;
 
+  DrivetrainMecanumWithSmarts ourDrivetrain = new DrivetrainMecanumWithSmarts();
+  Vision ourVision = new Vision();
+  Arm ourArm = new Arm();
+  ActiveIntakeWithServo ourActiveIntake = new ActiveIntakeWithServo();
+  Winch ourWinch = new Winch();
+  
+  
   /**
    * This function is executed when this OpMode is selected from the Driver Station.
    */
   @Override
   public void runOpMode() {
 
-    //PixelEjector.init("motor_dropPixels");
-
     // Initialize vision libraries
-    useVision = Vision.initVision2Cameras(cameraNameFront, cameraNameBack);
+    useVision = ourVision.initVision2Cameras(cameraNameFront, cameraNameBack);
 
     runtime = new ElapsedTime();
 
     // Initialize Drivetrain
-    DrivetrainMecanumWithSmarts.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
+    ourDrivetrain.initDriveTrainWithSmarts("left_front_drive", "left_back_drive", "right_front_drive", "right_back_drive", "distance_left_front");
 
     // Set drive to A Config.
-    DrivetrainMecanumWithSmarts.setDriveToAConfig();
+    ourDrivetrain.setDriveToAConfig();
 
     // Initialize Arm and Poses
-    Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
+    ourArm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
 
     // Initialize gripper
-    ActiveIntakeWithServo.init("motor_intake");
+    ourActiveIntake.init("motor_intake");
 
     // Initialize winch
-    Winch.init("motor_winch");
+    ourWinch.init("motor_winch");
 
     // Wait for the game to start (driver presses PLAY)
     telemetry.addData("Status", "Initialized");
@@ -97,7 +102,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       telemetry.update();
     }
 
-    currentAlliance = Vision.setAlliance(currentAlliance);
+    currentAlliance = ourVision.setAlliance(currentAlliance);
 
     telemetry.addData("ALLIANCE [1=Red, 2=Blue, 0=Unset]", currentAlliance);
     telemetry.addData("LOCATION", currentLocation);
@@ -116,7 +121,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       desiredTagID = 0;
 
       // Runs arm based if on a state.
-      Arm.runArmIteration();
+      ourArm.runArmIteration();
 
       // By gamepad1 left bumper / trigger
       IfAskedToggleSpeedOrCameraDriveConfig();
@@ -160,19 +165,19 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     if (gamepad2.y) {
       telemetry.addLine("FUNCTION: Move to Pose UP");
       // Moves the arm to an UP pose.
-      Arm.moveToPose_UP();
+      ourArm.moveToPose_UP();
     } else if (gamepad2.a) {
       telemetry.addLine("FUNCTION: Move to Pose FLOOR");
       // Moves the arm to an FLOOR pose.
-      Arm.moveToPose_FLOOR();
+      ourArm.moveToPose_FLOOR();
     } else if (gamepad2.b) {
       telemetry.addLine("FUNCTION: Move to Pose TRAVEL");
       // Moves the arm to an TRAVEL pose.
-      Arm.moveToPose_TRAVEL();
+      ourArm.moveToPose_TRAVEL();
     } else if (gamepad2.x) {
       telemetry.addLine("FUNCTION: Move to Pose BACKDROP");
       // Moves the arm to an BACKDROP pose.
-      Arm.moveToPose_BACKDROP();
+      ourArm.moveToPose_BACKDROP();
     }
   }
 
@@ -180,19 +185,19 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     double threshold = 0.2;
 
     if (gamepad2.left_bumper) {
-      Arm.moveWristByIncrement(0.003);
+      ourArm.moveWristByIncrement(0.003);
     } else if (gamepad2.left_trigger != 0) {
-      Arm.moveWristByIncrement(-0.003);
+      ourArm.moveWristByIncrement(-0.003);
     }
     if (gamepad2.right_bumper) {
-      Arm.moveElbowByIncrement(0.003);
+      ourArm.moveElbowByIncrement(0.003);
     } else if (gamepad2.right_trigger != 0) {
-      Arm.moveElbowByIncrement(-0.003);
+      ourArm.moveElbowByIncrement(-0.003);
     }
     if (gamepad2.right_stick_y < 0 && abs(gamepad2.right_stick_y) > threshold) {// Increase
-      Arm.moveShoulderByIncrement(0.001);
+      ourArm.moveShoulderByIncrement(0.001);
     } else if (gamepad2.right_stick_y > 0 && abs(gamepad2.right_stick_y) > threshold) {// Decrease
-      Arm.moveShoulderByIncrement(-0.001);
+      ourArm.moveShoulderByIncrement(-0.001);
     }
   }
 
@@ -202,26 +207,13 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   private void IfAskedDoIntake() {
     if (gamepad2.dpad_down) {
       // Moves intake inward
-      ActiveIntakeWithServo.moveInward();
+      ourActiveIntake.moveInward();
     } else if (gamepad2.dpad_up) {
       // Stops the intake
-      ActiveIntakeWithServo.moveOutward();
+      ourActiveIntake.moveOutward();
     } else  {
       // Moves intake outward
-      ActiveIntakeWithServo.stop();
-    }
-  }
-
-  /**
-   * Describe this function...
-   */
-  public void IfAskedEjectLowerPixel() {
-    if (gamepad1.right_bumper) {
-      PixelEjector.moveInward();
-    } else if (gamepad1.right_trigger != 0) {
-      PixelEjector.moveOutward();
-    } else {
-      PixelEjector.stop();
+      ourActiveIntake.stop();
     }
   }
 
@@ -229,11 +221,11 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     double threshold = 0.2;
 
     if (gamepad2.left_stick_y < 0 && abs(gamepad2.left_stick_y) > threshold) // Move up
-      Winch.moveInward();
+      ourWinch.moveInward();
     else if (gamepad2.left_stick_y > 0 && abs(gamepad2.left_stick_y) > threshold) // Move down
-      Winch.moveOutward();
+      ourWinch.moveOutward();
     else
-      Winch.stop();
+      ourWinch.stop();
   }
 
   /**
@@ -259,22 +251,22 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       if (currentCameraName.equals(cameraNameFront)) {
 
         // Changing to Back camera.  Switches based on input.
-        Vision.doCameraSwitching(cameraNameBack);
+        ourVision.doCameraSwitching(cameraNameBack);
         currentCameraName = cameraNameBack;
 
         // Set drive to B Config.
-        DrivetrainMecanumWithSmarts.setDriveToBConfig();
+        ourDrivetrain.setDriveToBConfig();
         currentDriveConfig = driveConfigB;
 
       } else {
 
         // Changing to Front camera
         // Switches the based on input.
-        Vision.doCameraSwitching(cameraNameFront);
+        ourVision.doCameraSwitching(cameraNameFront);
         currentCameraName = cameraNameFront;
 
         // Set drive to A Config.
-        DrivetrainMecanumWithSmarts.setDriveToAConfig();
+        ourDrivetrain.setDriveToAConfig();
         currentDriveConfig = driveConfigA;
       }
     }
@@ -302,7 +294,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       telemetry.addData("RELATIVE TAG REQUESTED", relativeTargetTag);
 
       // Let's determine the AprilTag target
-      desiredTagID = Vision.getCENTERSTAGEDesiredTag(currentAlliance, relativeTargetTag);
+      desiredTagID = ourVision.getCENTERSTAGEDesiredTag(currentAlliance, relativeTargetTag);
 
       telemetry.addData("AUTO: Relative Target Tag requested", relativeTargetTag);
       telemetry.addData("AUTO: Desired Tag ID", desiredTagID);
@@ -310,7 +302,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       if (desiredTagID == 0) return;
 
       // Determines and sets latest values for desired AprilTag
-      targetTagFound = Vision.getTagInfo(desiredTagID);
+      targetTagFound = ourVision.getTagInfo(desiredTagID);
 
       telemetry.addData("AUTO: Target Found", targetTagFound);
 
@@ -318,13 +310,13 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
         // Determine range, heading and yaw (tag image rotation) so we can use them to
         // control the robot automatically.
-        double range = Vision.getTagRange(desiredTagID);
-        double heading = Vision.getTagBearing(desiredTagID);
-        double yaw = Vision.getTagYaw(desiredTagID);
+        double range = ourVision.getTagRange(desiredTagID);
+        double heading = ourVision.getTagBearing(desiredTagID);
+        double yaw = ourVision.getTagYaw(desiredTagID);
 
         telemetry.addData("TAG: range, heading, yaw", JavaUtil.formatNumber(range, 4, 2) + ", " + JavaUtil.formatNumber(heading, 4, 2) + ", " + JavaUtil.formatNumber(yaw, 4, 2));
 
-        DrivetrainMecanumWithSmarts.driveToHeading(desiredTagDistance, range, heading, yaw);
+        ourDrivetrain.driveToHeading(desiredTagDistance, range, heading, yaw);
         
       } else {
 
@@ -340,15 +332,15 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
       telemetry.addData("MANUAL DRIVE", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
 
-      // Apply desired axes motions to the drivetrain.
-      DrivetrainMecanumWithSmarts.driveXYZ(drive, strafe, turn);
+      // Apply desired axes motions to the ourDrivetrain.
+      ourDrivetrain.driveXYZ(drive, strafe, turn);
     }
 
     sleep(10);
   }
 
   private void IfAskedToLoosenArm() {
-    if (gamepad2.back) Arm.loosenArmJoints();
+    if (gamepad2.back) ourArm.loosenArmJoints();
   }
 
   /**
