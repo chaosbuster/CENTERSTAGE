@@ -475,6 +475,117 @@ public class Vision extends BlocksOpModeCompanion
         return locationTeamProp;
     }
 
+    @ExportToBlocks (
+            heading = "Vision: Get Team Prop Location ANY MATCH",
+            color = 255,
+            comment = "Indicates whether the Team Prop is in sight.",
+            tooltip = "Returns an integer [1=Left,2=Center, 3=Right]",
+            parameterLabels = {"Tensorflow Labels To Look For",
+                    "Pixel location to split Center and Right locations"
+            }
+    )
+    public static int getTeamPropLocationANYMATCH(String DESIRED_TFOD_LABELS, int splitCenterRight)
+    {
+        locationTeamProp = 1;  // Default is Left
+
+        if (tfod == null) {
+            return locationTeamProp;
+        }
+
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+
+        if (currentRecognitions == null) {
+            return locationTeamProp;
+        }
+
+        telemetry.addData("# Objects Detected", currentRecognitions.size());
+
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+
+            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+
+            telemetry.addData(""," ");
+            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+
+            if (DESIRED_TFOD_LABELS.contains(recognition.getLabel())) {
+
+                telemetry.addData("Requested Object Detected", recognition.getLabel());
+
+                if (x <= splitCenterRight ) {
+                    locationTeamProp = 2;
+                    telemetry.addData("Object Location", "CENTER");
+
+                } else {
+                    locationTeamProp = 3;
+                    telemetry.addData("Object Location", "RIGHT");
+                }
+            }
+
+        }   // end for() loop
+
+        return locationTeamProp;
+    }
+
+
+    @ExportToBlocks (
+            heading = "Vision: Get Team Prop Location ANY MATCH (Left2Center)",
+            color = 255,
+            comment = "Indicates whether the Team Prop is in sight.",
+            tooltip = "Returns an integer [1=Left,2=Center, 3=Right]",
+            parameterLabels = {"Tensorflow Labels To Look For",
+                    "Pixel location to split Left and Center locations"
+            }
+    )
+    public static int getTeamPropLocationANYMATCHL2C(String DESIRED_TFOD_LABELS, int splitLeftCenter)
+    {
+        locationTeamProp = 3;  // Default is Right
+
+        if (tfod == null) {
+            return locationTeamProp;
+        }
+
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+
+        if (currentRecognitions == null) {
+            return locationTeamProp;
+        }
+
+        telemetry.addData("# Objects Detected", currentRecognitions.size());
+
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitions) {
+
+            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+
+            telemetry.addData(""," ");
+            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+
+            if (DESIRED_TFOD_LABELS.contains(recognition.getLabel())) {
+
+                telemetry.addData("Requested Object Detected", recognition.getLabel());
+
+                if (x <= splitLeftCenter ) {
+                    locationTeamProp = 1;
+                    telemetry.addData("Object Location", "LEFT");
+
+                } else {
+                    locationTeamProp = 2;
+                    telemetry.addData("Object Location", "CENTER");
+                }
+            }
+
+        }   // end for() loop
+
+        return locationTeamProp;
+    }
+
 
     @ExportToBlocks (
         heading = "Vision: Is Tag Visible",
