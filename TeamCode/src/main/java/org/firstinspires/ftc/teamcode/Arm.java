@@ -103,7 +103,7 @@ public class Arm extends BlocksOpModeCompanion {
         telemetry.addData("UP Pose, Shoulder current position", shoulder.getCurrentPosition());
         
         telemetry.addData("UP Pose, Elbow target", poseUp.getPoseElbowTarget());
-        telemetry.addData("UP Pose, Shoulder increment", elbow.getCurrentIncrement());  
+        telemetry.addData("UP Pose, Elbow increment", elbow.getCurrentIncrement());
         telemetry.addData("UP Pose, Elbow current position", elbow.getCurrentPosition());        
         
         telemetry.addData("UP Pose, Wrist target",  poseUp.getPoseWristTarget());  
@@ -160,7 +160,7 @@ public class Arm extends BlocksOpModeCompanion {
         telemetry.addData("FLOOR Pose, Shoulder current position", shoulder.getCurrentPosition());
         
         telemetry.addData("FLOOR Pose, Elbow target", poseFloor.getPoseElbowTarget());
-        telemetry.addData("FLOOR Pose, Shoulder increment", elbow.getCurrentIncrement());  
+        telemetry.addData("FLOOR Pose, Elbow increment", elbow.getCurrentIncrement());
         telemetry.addData("FLOOR Pose, Elbow current position", elbow.getCurrentPosition());        
         
         telemetry.addData("FLOOR Pose, Wrist target",  poseFloor.getPoseWristTarget());  
@@ -217,7 +217,7 @@ public class Arm extends BlocksOpModeCompanion {
         telemetry.addData("TRAVEL Pose, Shoulder current position", shoulder.getCurrentPosition());
         
         telemetry.addData("TRAVEL Pose, Elbow target", poseTravel.getPoseElbowTarget());
-        telemetry.addData("TRAVEL Pose, Shoulder increment", elbow.getCurrentIncrement());  
+        telemetry.addData("TRAVEL Pose, Elbow increment", elbow.getCurrentIncrement());
         telemetry.addData("TRAVEL Pose, Elbow current position", elbow.getCurrentPosition());        
         
         telemetry.addData("TRAVEL Pose, Wrist target",  poseTravel.getPoseWristTarget());  
@@ -274,7 +274,7 @@ public class Arm extends BlocksOpModeCompanion {
         telemetry.addData("BACKDROP Pose, Shoulder current position", shoulder.getCurrentPosition());
         
         telemetry.addData("BACKDROP Pose, Elbow target", poseBackdrop.getPoseElbowTarget());
-        telemetry.addData("BACKDROP Pose, Shoulder increment", elbow.getCurrentIncrement());  
+        telemetry.addData("BACKDROP Pose, Elbow increment", elbow.getCurrentIncrement());
         telemetry.addData("BACKDROP Pose, Elbow current position", elbow.getCurrentPosition());        
         
         telemetry.addData("BACKDROP Pose, Wrist target",  poseBackdrop.getPoseWristTarget());  
@@ -354,7 +354,7 @@ public class Arm extends BlocksOpModeCompanion {
         // public Pose(String _name, double _shoulder, double _elbow, double _wrist)        
         poseInit = new Pose("Initial", 0.25, 1.0, 1.0);
         poseUp = new Pose("Up", 0.492, 0.526, 0.151);
-        poseFloor = new Pose("Floor", 0.479, 0.167, 0.626);
+        poseFloor = new Pose("Floor", 0.479, 0.0167, 0.626);
         poseTravel = new Pose("Travel", 0.252, 0.999, 0.803);
         poseBackdrop = new Pose("Backdrop", 0.597, 0.513, 0.264);
     

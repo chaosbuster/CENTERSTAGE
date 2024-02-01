@@ -92,7 +92,7 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
         currentSpeed = servo.getPosition();
         if (stateOfIntake != STATE_MOVINGIN) {
             servo.setPosition(STATE_STOPPED);            
-            servo.setDirection(Servo.Direction.FORWARD);
+            servo.setDirection(Servo.Direction.REVERSE);
             stateOfIntake = STATE_MOVINGIN;
         }
         servo.setPosition(SPEED_TOMOVE);
@@ -110,7 +110,7 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
         currentSpeed = servo.getPosition();
         if (stateOfIntake != STATE_MOVINGOUT) {
             servo.setPosition(STATE_STOPPED);
-            servo.setDirection(Servo.Direction.REVERSE);
+            servo.setDirection(Servo.Direction.FORWARD);
             stateOfIntake = STATE_MOVINGOUT;
         }
         servo.setPosition(SPEED_TOMOVE);

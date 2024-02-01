@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
-import java.util.Arrays;
-
 @TeleOp(name = "TeleOpMode_withDriveToTag_V1_7 (Blocks to Java)")
 public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
 
@@ -56,10 +54,10 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
   @Override
   public void runOpMode() {
 
-    PixelEjector.init("motor_dropPixels");
+    //PixelEjector.init("motor_dropPixels");
 
     // Initialize vision libraries
-    useVision = Vision.initVision2Cameras(cameraNameFront, cameraNameBack, "bp_253_ssd_v2_fpnlite_320x320_metadata.tflite", Arrays.asList("Bolt"));
+    useVision = Vision.initVision2Cameras(cameraNameFront, cameraNameBack);
 
     runtime = new ElapsedTime();
 
@@ -73,7 +71,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
     Arm.initArm("motor_shoulder", "motor_elbow", "motor_wrist");
 
     // Initialize gripper
-    ActiveIntakeWithServo.init("motor_gripper");
+    ActiveIntakeWithServo.init("motor_intake");
 
     // Initialize winch
     Winch.init("motor_winch");
@@ -127,7 +125,7 @@ public class TeleOpMode_withDriveToTag_V1_7 extends LinearOpMode {
       IfRequestingToDrive();
 
       // By gamepad1 right bumper / trigger
-      IfAskedEjectLowerPixel();
+      //IfAskedEjectLowerPixel();
 
       // By gamepad2 XYAB
       IfAskedPose();
