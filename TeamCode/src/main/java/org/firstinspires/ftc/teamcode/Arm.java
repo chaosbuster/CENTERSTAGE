@@ -15,7 +15,8 @@ public class Arm extends BlocksOpModeCompanion {
     static private enum State {
         INIT,
         WAITING_FOR_COMMAND,
-        MOVING_TO_FLOOR_POSE, 
+        MOVING_TO_FLOOR_POSE,
+        MOVING_TO_FLOORDROP_POSE,
         MOVING_TO_TRAVEL_POSE,
         MOVING_TO_BACKDROP_POSE,
         MOVING_TO_UP_POSE,         
@@ -34,7 +35,8 @@ public class Arm extends BlocksOpModeCompanion {
     // Constructor and initialization of poses  
     static private Pose poseInit = null;
     static private Pose poseUp = null;    
-    static private Pose poseFloor = null;   
+    static private Pose poseFloor = null;
+    static private Pose poseFloorDrop = null;
     static private Pose poseTravel = null;   
     static private Pose poseBackdrop = null;   
     
@@ -130,13 +132,70 @@ public class Arm extends BlocksOpModeCompanion {
         break;
         
       }
-      
+
       case MOVING_TO_FLOOR_POSE: {
+
+          // Check to see if we have timed out on the movement request
+          if ( timerOfARunState.milliseconds() > maxRunTime) {
+
+              telemetry.addData("Arm: ", "TIMED OUT WHILE MOVING TO FLOOR POSE");
+
+              // Stop arm motions
+              stopMovement();
+
+              // Change our state
+              armState = State.WAITING_FOR_COMMAND;
+
+              break;
+          }
+
+          // Let's move to target that has already been set
+          shoulderMovingToTarget = shoulder.movingtoTarget();
+          elbowMovingToTarget = elbow.movingtoTarget();
+          wristMovingToTarget = wrist.movingtoTarget();
+
+          telemetry.addData("Arm: ", " MOVING TO FLOOR POSE");
+          // keeps looping while we are still moving joints to their target position.
+
+          telemetry.addData("FLOOR Pose, Shoulder target", poseFloor.getPoseShoulderTarget());
+          telemetry.addData("FLOOR Pose, Shoulder increment", shoulder.getCurrentIncrement());
+          telemetry.addData("FLOOR Pose, Shoulder current position", shoulder.getCurrentPosition());
+
+          telemetry.addData("FLOOR Pose, Elbow target", poseFloor.getPoseElbowTarget());
+          telemetry.addData("FLOOR Pose, Elbow increment", elbow.getCurrentIncrement());
+          telemetry.addData("FLOOR Pose, Elbow current position", elbow.getCurrentPosition());
+
+          telemetry.addData("FLOOR Pose, Wrist target",  poseFloor.getPoseWristTarget());
+          telemetry.addData("FLOOR Pose, Wrist increment", wrist.getCurrentIncrement());
+          telemetry.addData("FLOOR Pose, Wrist current position", wrist.getCurrentPosition());
+
+          telemetry.update();
+
+          // Check to see if all arm joints are done
+          if (! shoulderMovingToTarget && ! elbowMovingToTarget && ! wristMovingToTarget) {
+
+              telemetry.addData("Arm: ", "DONE MOVING TO FLOOR POSE");
+
+              // Stop arm motions
+              stopMovement();
+
+              // Change our state
+              armState = State.WAITING_FOR_COMMAND;
+
+              break;
+          }
+
+          // Break out of this case of moving to Floor pose
+          break;
+
+        }
+
+        case MOVING_TO_FLOORDROP_POSE: {
                 
         // Check to see if we have timed out on the movement request
         if ( timerOfARunState.milliseconds() > maxRunTime) {
             
-            telemetry.addData("Arm: ", "TIMED OUT WHILE MOVING TO FLOOR POSE");
+            telemetry.addData("Arm: ", "TIMED OUT WHILE MOVING TO FLOORDROP POSE");
                     
             // Stop arm motions            
             stopMovement();
@@ -152,27 +211,27 @@ public class Arm extends BlocksOpModeCompanion {
         elbowMovingToTarget = elbow.movingtoTarget(); 
         wristMovingToTarget = wrist.movingtoTarget();
 
-        telemetry.addData("Arm: ", " MOVING TO FLOOR POSE");
+        telemetry.addData("Arm: ", " MOVING TO FLOORDROP POSE");
         // keeps looping while we are still moving joints to their target position.
         
-        telemetry.addData("FLOOR Pose, Shoulder target", poseFloor.getPoseShoulderTarget());
-        telemetry.addData("FLOOR Pose, Shoulder increment", shoulder.getCurrentIncrement());        
-        telemetry.addData("FLOOR Pose, Shoulder current position", shoulder.getCurrentPosition());
+        telemetry.addData("FLOORDROP Pose, Shoulder target", poseFloorDrop.getPoseShoulderTarget());
+        telemetry.addData("FLOORDROP Pose, Shoulder increment", shoulder.getCurrentIncrement());
+        telemetry.addData("FLOORDROP Pose, Shoulder current position", shoulder.getCurrentPosition());
         
-        telemetry.addData("FLOOR Pose, Elbow target", poseFloor.getPoseElbowTarget());
-        telemetry.addData("FLOOR Pose, Elbow increment", elbow.getCurrentIncrement());
-        telemetry.addData("FLOOR Pose, Elbow current position", elbow.getCurrentPosition());        
+        telemetry.addData("FLOORDROP Pose, Elbow target", poseFloorDrop.getPoseElbowTarget());
+        telemetry.addData("FLOORDROP Pose, Elbow increment", elbow.getCurrentIncrement());
+        telemetry.addData("FLOORDROP Pose, Elbow current position", elbow.getCurrentPosition());
         
-        telemetry.addData("FLOOR Pose, Wrist target",  poseFloor.getPoseWristTarget());  
-        telemetry.addData("FLOOR Pose, Wrist increment", wrist.getCurrentIncrement());          
-        telemetry.addData("FLOOR Pose, Wrist current position", wrist.getCurrentPosition());   
+        telemetry.addData("FLOORDROP Pose, Wrist target",  poseFloorDrop.getPoseWristTarget());
+        telemetry.addData("FLOORDROP Pose, Wrist increment", wrist.getCurrentIncrement());
+        telemetry.addData("FLOORDROP Pose, Wrist current position", wrist.getCurrentPosition());
         
         telemetry.update();
         
         // Check to see if all arm joints are done        
         if (! shoulderMovingToTarget && ! elbowMovingToTarget && ! wristMovingToTarget) {
             
-            telemetry.addData("Arm: ", "DONE MOVING TO FLOOR POSE");
+            telemetry.addData("Arm: ", "DONE MOVING TO FLOORDROP POSE");
             
             // Stop arm motions
             stopMovement();
@@ -183,7 +242,7 @@ public class Arm extends BlocksOpModeCompanion {
             break;
         }                  
                 
-        // Break out of this case of moving to Floor pose
+        // Break out of this case of moving to FloorDrop pose
         break;
         
       }
@@ -340,9 +399,9 @@ public class Arm extends BlocksOpModeCompanion {
        
         // Constructor of arm joints   
         // ArmJoint(String _servoName, double initPosition, double Min, double Max, double Increment)
-        shoulder = new ArmJoint(_shoulderName, hardwareMap.get(Servo.class, _shoulderName), 0.25, 0.25, 0.8, 0.001); 
-        elbow = new ArmJoint(_elbowName,hardwareMap.get(Servo.class, _elbowName), 1, 0, 1, 0.001); 
-        wrist = new ArmJoint(_wristName, hardwareMap.get(Servo.class, _wristName), 1, 0, 1, 0.001); 
+        shoulder = new ArmJoint(_shoulderName, hardwareMap.get(Servo.class, _shoulderName), 0.25, 0.25, 0.8, 0.001);
+        elbow = new ArmJoint(_elbowName,hardwareMap.get(Servo.class, _elbowName), 1, 0, 1, 0.0001);
+        wrist = new ArmJoint(_wristName, hardwareMap.get(Servo.class, _wristName), 1, 0, 1, 0.0001);
     
         // Initialize all of our servos on the arm.  DOES NOT include the gripper.
         shoulder.init();       
@@ -355,6 +414,7 @@ public class Arm extends BlocksOpModeCompanion {
         poseInit = new Pose("Initial", 0.25, 1.0, 1.0);
         poseUp = new Pose("Up", 0.492, 0.526, 0.151);
         poseFloor = new Pose("Floor", 0.479, 0.0167, 0.626);
+        poseFloorDrop = new Pose("FloorDrop", 0.479, 0.0167, 0.626);
         poseTravel = new Pose("Travel", 0.252, 0.999, 0.803);
         poseBackdrop = new Pose("Backdrop", 0.597, 0.513, 0.264);
     
@@ -419,7 +479,35 @@ public class Arm extends BlocksOpModeCompanion {
         
     }   // end method moveToPose_FLOOR()
 
-    
+
+    @ExportToBlocks (
+            heading = "Arm: Move To FLOORDROP Pose",
+            color = 255,
+            comment = "Moves the arm to a FLOORDROP pose.",
+            tooltip = "Stop by quitting program or selecting another pose.",
+            parameterLabels = {}
+    )
+    /**
+     */
+    static public void moveToPose_FLOORDROP() {
+
+        // Set arm joints to pose target positions
+        shoulder.setTargetPosition(poseFloorDrop.getPoseShoulderTarget(), numberStepsBetweenPoses);
+        elbow.setTargetPosition(poseFloorDrop.getPoseElbowTarget(), numberStepsBetweenPoses);
+        wrist.setTargetPosition(poseFloorDrop.getPoseWristTarget(), numberStepsBetweenPoses);
+
+        // Start moving shoulder joint, and then enter the control loop
+        shoulder.movingtoTarget();
+
+        // Set the state that was requested
+        armState = State.MOVING_TO_FLOORDROP_POSE;
+        timerOfARunState.reset();
+
+        //  Our RunArmIteration() takes over from here. Put if in your main loop.
+
+    }   // end method moveToPose_FLOORDROP()
+
+
     @ExportToBlocks (
         heading = "Arm: Move To TRAVEL Pose",
         color = 255,
