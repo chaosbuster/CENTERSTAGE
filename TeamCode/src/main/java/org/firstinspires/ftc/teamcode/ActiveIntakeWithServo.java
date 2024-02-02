@@ -60,7 +60,7 @@ public class ActiveIntakeWithServo extends BlocksOpModeCompanion {
 
         moveOutward();
         try {
-            Thread.sleep(4000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
