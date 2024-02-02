@@ -998,5 +998,17 @@ public class Vision extends BlocksOpModeCompanion
 
     }   // end method telemetryTfod()
 
-
+    @ExportToBlocks (
+            heading = "Vision: Disable TFOD",
+            color = 255,
+            comment = "Turns off TFOD processing.",
+            tooltip = "Save your CPU!"
+    )
+    /**
+     * Disables the Tensorflow Model object detection to save CPU in the OpMode
+     */
+    private void disableTFOD() {
+       // Enable or disable the TensorFlow Object Detection processor.
+        visionPortal.setProcessorEnabled(tfod, false);
+    }
 }
